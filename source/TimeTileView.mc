@@ -13,6 +13,8 @@ class TimeTileView extends WatchUi.WatchFace {
         dc.setColor(TimeTileStyle.BACKGROUND_COLOR, TimeTileStyle.BACKGROUND_COLOR);
         dc.clear();
 
+        drawStripe(dc);
+
         var timeCenterX = TimeTileStyle.TIME_AREA_LEFT
             + ((TimeTileStyle.TIME_AREA_RIGHT - TimeTileStyle.TIME_AREA_LEFT) / 2);
         var clockTime = System.getClockTime();
@@ -52,6 +54,16 @@ class TimeTileView extends WatchUi.WatchFace {
             Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER
         );
         dc.clearClip();
+    }
+
+    private function drawStripe(dc as Dc) as Void {
+        dc.setColor(TimeTileStyle.STRIPE_COLOR, TimeTileStyle.STRIPE_COLOR);
+        dc.fillRectangle(
+            TimeTileStyle.STRIPE_LEFT_X,
+            TimeTileStyle.STRIPE_TOP_Y,
+            TimeTileStyle.STRIPE_WIDTH,
+            TimeTileStyle.STRIPE_HEIGHT
+        );
     }
 
     private function hourForDisplay(hour24 as Number, is24Hour as Boolean) as Number {

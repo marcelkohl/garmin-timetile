@@ -10,12 +10,13 @@ module TimeTileStyle {
     // Custom font sizes will later be provided as separate compiled font resources.
     const TIME_FONT = Graphics.FONT_NUMBER_THAI_HOT;
 
+    const SCREEN_CENTER_Y = 104;
+
     // Horizontal time area (right side beyond TIME_AREA_RIGHT is reserved for the stripe).
     const TIME_AREA_LEFT = 10;
-    const TIME_AREA_RIGHT = 152;
+    const TIME_AREA_RIGHT = 145;
 
     // Vertical layout: hour and minutes mirrored around the screen center.
-    const SCREEN_CENTER_Y = 104;
     const HOUR_CENTER_Y = 76;
     const MINUTE_CENTER_Y = 132;
 
@@ -30,4 +31,11 @@ module TimeTileStyle {
     const MINUTE_CLIP_Y = SCREEN_CENTER_Y;
     const MINUTE_CLIP_WIDTH = TIME_AREA_RIGHT - TIME_AREA_LEFT;
     const MINUTE_CLIP_HEIGHT = SCREEN_CENTER_Y;
+
+    // Plain vertical stripe rectangle.
+    const STRIPE_COLOR = Graphics.COLOR_BLUE;
+    const STRIPE_LEFT_X = 150;
+    const STRIPE_TOP_Y = 0;
+    const STRIPE_WIDTH = 50;
+    const STRIPE_HEIGHT = 250;
 }
