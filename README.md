@@ -19,6 +19,15 @@ data fields, and styling are **not implemented**.
 
 Only `fr55` is supported in this repository.
 
+## Ubuntu 24.04
+
+On Ubuntu 24.04, Garmin Connect IQ tools run inside an Ubuntu 22.04 Distrobox
+container named `garmin-sdk` (host Cursor/Make stay on the host; the home
+directory and this repository are shared). Full host/container setup,
+SDK installation, developer-key creation, and troubleshooting:
+
+→ **[docs/ubuntu-24.04-setup.md](docs/ubuntu-24.04-setup.md)**
+
 ## Distrobox requirement
 
 Garmin SDK tools run inside a Distrobox container. Cursor and Make run on the
@@ -71,6 +80,8 @@ make build DEVELOPER_KEY="$HOME/.config/garmin-connect-iq/developer_key.der"
 .
 ├── Makefile
 ├── README.md
+├── docs/
+│   └── ubuntu-24.04-setup.md
 ├── manifest.xml
 ├── monkey.jungle
 ├── resources/
