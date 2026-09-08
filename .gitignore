@@ -1,0 +1,43 @@
+# Build artifacts
+/build/
+*.prg
+*.iq
+*.prg.debug.xml
+*.mir
+*.mbc
+*.mbl
+*.mxy
+
+# Compiler / debug output
+*.log
+*.debug.xml
+gen/
+bin/
+output/
+
+# Developer keys — never commit these
+*.der
+*.pem
+developer_key*
+*_key*
+
+# Editor-local files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+.project
+.settings/
+.cproject
+
+# Operating-system metadata
+.DS_Store
+.DS_Store?
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+*$PYTHONDONTWRITEBYTECODE*
+__pycache__/

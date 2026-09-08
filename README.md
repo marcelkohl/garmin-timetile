@@ -1,2 +1,106 @@
-# garmin-timetile
-Garmin Watchface Time Tile
+# Time Tile
+
+Minimal Garmin Connect IQ watch face for the Forerunner 55 (`fr55`).
+
+## Current status
+
+Initial project scaffolding only. The watch face currently draws a black
+background with centered white text reading **Time Tile**. Final layout,
+data fields, and styling are **not implemented**.
+
+## Supported device
+
+| Item | Value |
+|------|-------|
+| Device | Forerunner 55 (`fr55`) |
+| Minimum API level | 3.4.0 |
+| Connect IQ SDK | 9.2.0 (active SDK from `current-sdk.cfg`) |
+| App version | 0.1.0 |
+
+Only `fr55` is supported in this repository.
+
+## Distrobox requirement
+
+Garmin SDK tools run inside a Distrobox container. Cursor and Make run on the
+host; the Makefile invokes tools with:
+
+```bash
+distrobox enter garmin-sdk -- …
+```
+
+Expected container name: `garmin-sdk` (override with `CONTAINER=…`).
+
+The project directory must be shared between the host and the container.
+
+## Developer key
+
+Default key path (outside the repository):
+
+```text
+$(HOME)/.config/garmin-connect-iq/developer_key.der
+```
+
+Override with `DEVELOPER_KEY=/path/to/key.der`.
+
+**Never commit developer keys** (`.der`, `.pem`, or key material). They are
+listed in `.gitignore` and must stay outside version control.
+
+## Makefile commands
+
+| Target | Description |
+|--------|-------------|
+| `make help` | List targets |
+| `make check` | Verify Distrobox, SDK, device package, and developer key |
+| `make build` | Compile and sign a debug `.prg` for `fr55` |
+| `make clean` | Delete `build/` artifacts only |
+| `make simulator` | Start the Connect IQ simulator (inside the container) |
+| `make run` | Build and launch the `.prg` in the simulator |
+
+Common overrides:
+
+```bash
+make build DEVICE=fr55
+make build CONTAINER=garmin-sdk
+make build SDK_CFG="$HOME/.Garmin/ConnectIQ/current-sdk.cfg"
+make build DEVELOPER_KEY="$HOME/.config/garmin-connect-iq/developer_key.der"
+```
+
+## Project structure
+
+```text
+.
+├── Makefile
+├── README.md
+├── manifest.xml
+├── monkey.jungle
+├── resources/
+│   ├── drawables/
+│   └── strings/
+├── source/
+│   ├── TimeTileApp.mc
+│   └── TimeTileView.mc
+└── build/                  (generated; gitignored)
+```
+
+## Troubleshooting
+
+- **`distrobox` not found** — install Distrobox on the host and ensure it is on `PATH`.
+- **Container errors** — confirm `distrobox enter garmin-sdk -- true` works.
+- **SDK path errors** — check `$(HOME)/.Garmin/ConnectIQ/current-sdk.cfg` points at the active SDK.
+- **`monkeyc` / `monkeydo` / `connectiq` missing** — reinstall or repair the Connect IQ SDK inside the container; do not change the host Java/SDK layout from this project.
+- **Device package missing** — install the `fr55` package via the Connect IQ SDK Manager into `$(HOME)/.Garmin/ConnectIQ/Devices/fr55`.
+- **Developer key missing** — place a valid `.der` key at the default path or pass `DEVELOPER_KEY=…`.
+
+## Roadmap (not implemented)
+
+The following are planned for later steps and are **not** part of this scaffold:
+
+- Final time layout
+- Date display
+- Vertical stripe
+- Widgets, icons, weather
+- Battery, steps, heart rate
+- Settings and themes
+- Custom fonts and localization
+- Additional device support
+- Simulator workflow validation
