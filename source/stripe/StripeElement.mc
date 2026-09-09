@@ -16,13 +16,13 @@ class StripeElement {
         centerY as Number,
         foregroundColor as Number
     ) as Void {
-        var width = TimeTileStyle.STRIPE_ELEMENT_WIDTH;
-        var rowHeight = TimeTileStyle.STRIPE_ROW_HEIGHT;
+        var width = StripeElementLayout.ELEMENT_WIDTH;
+        var rowHeight = StripeElementLayout.ROW_HEIGHT;
         var elementX = centerX - (width / 2);
-        var elementY = centerY - (TimeTileStyle.STRIPE_ELEMENT_HEIGHT / 2);
+        var elementY = centerY - (StripeElementLayout.ELEMENT_HEIGHT / 2);
 
         var topBounds = [elementX, elementY, width, rowHeight] as Array<Number>;
-        drawBoundedRow(dc, 0, topBounds, foregroundColor);
+        drawBoundedRow(dc, StripeElementLayout.ROW_TOP, topBounds, foregroundColor);
 
         var bottomBounds = [
             elementX,
@@ -30,7 +30,7 @@ class StripeElement {
             width,
             rowHeight
         ] as Array<Number>;
-        drawBoundedRow(dc, 1, bottomBounds, foregroundColor);
+        drawBoundedRow(dc, StripeElementLayout.ROW_BOTTOM, bottomBounds, foregroundColor);
     }
 
     // rowBounds = [x, y, width, height]
@@ -67,7 +67,7 @@ class StripeElement {
     }
 
     // Override to draw an optional icon/background inside the row bounds.
-    // rowIndex: 0 = top, 1 = bottom.
+    // rowIndex: StripeElementLayout.ROW_TOP or ROW_BOTTOM.
     function drawRowIcon(
         dc as Dc,
         rowIndex as Number,
@@ -83,6 +83,6 @@ class StripeElement {
 
     // Override to choose a row-specific font; default is the shared row font.
     function getRowFont(rowIndex as Number) as FontDefinition {
-        return TimeTileStyle.STRIPE_ROW_FONT;
+        return StripeElementLayout.DEFAULT_ROW_FONT;
     }
 }

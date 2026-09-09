@@ -9,11 +9,7 @@ class TimeTileView extends WatchUi.WatchFace {
 
     function initialize() {
         WatchFace.initialize();
-        _stripePanel = new StripePanel([
-            StripeElementRegistry.BATTERY,
-            StripeElementRegistry.CALENDAR,
-            StripeElementRegistry.STEPS
-        ] as Array<Number>);
+        _stripePanel = new StripePanel(StripeConfiguration.elementIds());
     }
 
     function onUpdate(dc as Dc) as Void {

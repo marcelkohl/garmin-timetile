@@ -2,7 +2,7 @@ import Toybox.ActivityMonitor;
 import Toybox.Graphics;
 import Toybox.Lang;
 
-// Bottom-slot steps: footprints in top row, step count text in bottom row.
+// Steps stripe element: footprints in top row, step count in bottom row.
 class StepsStripeElement extends StripeElement {
 
     function initialize() {
@@ -15,7 +15,7 @@ class StepsStripeElement extends StripeElement {
         rowBounds as Array<Number>,
         foregroundColor as Number
     ) as Void {
-        if (rowIndex != 0) {
+        if (rowIndex != StripeElementLayout.ROW_TOP) {
             return;
         }
 
@@ -25,7 +25,7 @@ class StepsStripeElement extends StripeElement {
     }
 
     function getRowText(rowIndex as Number) as String or Null {
-        if (rowIndex != 1) {
+        if (rowIndex != StripeElementLayout.ROW_BOTTOM) {
             return null;
         }
         return formatSteps(stepsCount());
@@ -37,23 +37,22 @@ class StepsStripeElement extends StripeElement {
         centerY as Number,
         foregroundColor as Number
     ) as Void {
-        var leftCenterX = centerX - TimeTileStyle.STEPS_FOOTPRINT_CENTER_OFFSET_X;
-        var rightCenterX = centerX + TimeTileStyle.STEPS_FOOTPRINT_CENTER_OFFSET_X;
+        var leftCenterX = centerX - StepsStripeStyle.FOOTPRINT_CENTER_OFFSET_X;
+        var rightCenterX = centerX + StepsStripeStyle.FOOTPRINT_CENTER_OFFSET_X;
 
-        var halfVertical = TimeTileStyle.STEPS_FOOTPRINT_VERTICAL_OFFSET / 2;
+        var halfVertical = StepsStripeStyle.FOOTPRINT_VERTICAL_OFFSET / 2;
         var leftCenterY = centerY - halfVertical;
         var rightCenterY = centerY + halfVertical;
 
-        var w = TimeTileStyle.STEPS_FOOTPRINT_WIDTH;
-        var h = TimeTileStyle.STEPS_FOOTPRINT_HEIGHT;
-        var s = TimeTileStyle.STEPS_FOOTPRINT_SLANT;
+        var w = StepsStripeStyle.FOOTPRINT_WIDTH;
+        var h = StepsStripeStyle.FOOTPRINT_HEIGHT;
+        var s = StepsStripeStyle.FOOTPRINT_SLANT;
 
         var leftTopY = leftCenterY - (h / 2);
         var leftBottomY = leftCenterY + (h / 2);
         var rightTopY = rightCenterY - (h / 2);
         var rightBottomY = rightCenterY + (h / 2);
 
-        // Left footprint: angled slightly left (toe extends left on the top edge).
         var leftToeTopX = leftCenterX - (w / 2) - s;
         var leftToeBottomX = leftCenterX - (w / 2);
         var leftHeelX = leftCenterX + (w / 2);
@@ -65,7 +64,6 @@ class StepsStripeElement extends StripeElement {
             [leftToeBottomX, leftBottomY]
         ] as Array<Graphics.Point2D>;
 
-        // Right footprint: angled slightly right (toe extends right on the bottom edge).
         var rightHeelX = rightCenterX - (w / 2);
         var rightToeTopX = rightCenterX + (w / 2);
         var rightToeBottomX = rightCenterX + (w / 2) + s;
@@ -99,10 +97,9 @@ class StepsStripeElement extends StripeElement {
         return stepsNum;
     }
 
-    // Deterministic formatting: 0..999 => full number, >=1000 => rounded down to whole K.
     private function formatSteps(stepsNum as Number) as String {
-        if (stepsNum >= 1000) {
-            var k = stepsNum / 1000;
+        if (stepsNum >= StepsStripeStyle.COMPACT_THRESHOLD) {
+            var k = stepsNum / StepsStripeStyle.COMPACT_THRESHOLD;
             return k.format("%d") + "K";
         }
         return stepsNum.format("%d");

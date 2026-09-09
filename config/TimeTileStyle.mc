@@ -1,6 +1,7 @@
 import Toybox.Graphics;
 
-// Developer-controlled visual constants for Time Tile (fr55, 208 x 208).
+// Watchface-level visual constants for Time Tile (fr55, 208 x 208).
+// Element-specific dimensions live under source/stripe/elements/.
 module TimeTileStyle {
 
     const BACKGROUND_COLOR = Graphics.COLOR_BLACK;
@@ -47,30 +48,4 @@ module TimeTileStyle {
 
     // Default stripe element foreground (later: user setting white/black only).
     const STRIPE_FOREGROUND_COLOR = Graphics.COLOR_WHITE;
-
-    // Shared two-row stripe element layout.
-    // ELEMENT_HEIGHT must equal ROW_HEIGHT * 2.
-    const STRIPE_ELEMENT_WIDTH = 40;
-    const STRIPE_ROW_HEIGHT = 16;
-    const STRIPE_ELEMENT_HEIGHT = STRIPE_ROW_HEIGHT * 2;
-    const STRIPE_ROW_PADDING = 2;
-    const STRIPE_ROW_ICON_INSET = 2;
-    const STRIPE_ROW_FONT = Graphics.FONT_XTINY;
-
-    // Battery icon geometry (top-row geometric primitives).
-    const BATTERY_BODY_WIDTH = 24;
-    const BATTERY_BODY_HEIGHT = 12;
-    const BATTERY_OUTLINE_THICKNESS = 2;
-    const BATTERY_TERMINAL_WIDTH = 3;
-    const BATTERY_TERMINAL_HEIGHT = 6;
-
-    // Calendar shape geometry within each row.
-    const CALENDAR_OUTLINE_THICKNESS = 2;
-
-    // Steps footprint geometry (provisional, top row).
-    const STEPS_FOOTPRINT_WIDTH = 12;
-    const STEPS_FOOTPRINT_HEIGHT = 8;
-    const STEPS_FOOTPRINT_SLANT = 2;
-    const STEPS_FOOTPRINT_CENTER_OFFSET_X = 4;
-    const STEPS_FOOTPRINT_VERTICAL_OFFSET = 4;
 }

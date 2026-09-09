@@ -1,6 +1,7 @@
 import Toybox.Lang;
 
 // Numeric identifiers and factory for stripe content elements.
+// Geometry, fonts, and slot selection do not belong here.
 module StripeElementRegistry {
 
     const NONE = 0;
@@ -10,6 +11,16 @@ module StripeElementRegistry {
 
     function availableIds() as Array<Number> {
         return [NONE, BATTERY, CALENDAR, STEPS] as Array<Number>;
+    }
+
+    function isValid(id as Number) as Boolean {
+        var ids = availableIds();
+        for (var i = 0; i < ids.size(); i += 1) {
+            if (ids[i] == id) {
+                return true;
+            }
+        }
+        return false;
     }
 
     function create(id as Number) as StripeElement {

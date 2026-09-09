@@ -2,7 +2,7 @@ import Toybox.Graphics;
 import Toybox.Lang;
 import Toybox.System;
 
-// Top-slot battery: icon in top row, percentage text in bottom row.
+// Battery stripe element: icon in top row, percentage text in bottom row.
 class BatteryStripeElement extends StripeElement {
 
     function initialize() {
@@ -15,7 +15,7 @@ class BatteryStripeElement extends StripeElement {
         rowBounds as Array<Number>,
         foregroundColor as Number
     ) as Void {
-        if (rowIndex != 0) {
+        if (rowIndex != StripeElementLayout.ROW_TOP) {
             return;
         }
 
@@ -25,22 +25,22 @@ class BatteryStripeElement extends StripeElement {
         var rowWidth = rowBounds[2];
         var rowHeight = rowBounds[3];
 
-        var totalWidth = TimeTileStyle.BATTERY_BODY_WIDTH + TimeTileStyle.BATTERY_TERMINAL_WIDTH;
+        var totalWidth = BatteryStripeStyle.BODY_WIDTH + BatteryStripeStyle.TERMINAL_WIDTH;
         var bodyX = rowX + ((rowWidth - totalWidth) / 2);
-        var bodyY = rowY + ((rowHeight - TimeTileStyle.BATTERY_BODY_HEIGHT) / 2);
-        var outline = TimeTileStyle.BATTERY_OUTLINE_THICKNESS;
+        var bodyY = rowY + ((rowHeight - BatteryStripeStyle.BODY_HEIGHT) / 2);
+        var outline = BatteryStripeStyle.OUTLINE_THICKNESS;
         var innerX = bodyX + outline;
         var innerY = bodyY + outline;
-        var innerWidth = TimeTileStyle.BATTERY_BODY_WIDTH - (outline * 2);
-        var innerHeight = TimeTileStyle.BATTERY_BODY_HEIGHT - (outline * 2);
+        var innerWidth = BatteryStripeStyle.BODY_WIDTH - (outline * 2);
+        var innerHeight = BatteryStripeStyle.BODY_HEIGHT - (outline * 2);
         var fillWidth = (innerWidth * percentage) / 100;
 
         dc.setColor(foregroundColor, foregroundColor);
         dc.fillRectangle(
             bodyX,
             bodyY,
-            TimeTileStyle.BATTERY_BODY_WIDTH,
-            TimeTileStyle.BATTERY_BODY_HEIGHT
+            BatteryStripeStyle.BODY_WIDTH,
+            BatteryStripeStyle.BODY_HEIGHT
         );
 
         dc.setColor(TimeTileStyle.STRIPE_COLOR, TimeTileStyle.STRIPE_COLOR);
@@ -51,20 +51,20 @@ class BatteryStripeElement extends StripeElement {
             dc.fillRectangle(innerX, innerY, fillWidth, innerHeight);
         }
 
-        var terminalX = bodyX + TimeTileStyle.BATTERY_BODY_WIDTH;
+        var terminalX = bodyX + BatteryStripeStyle.BODY_WIDTH;
         var terminalY = bodyY
-            + ((TimeTileStyle.BATTERY_BODY_HEIGHT - TimeTileStyle.BATTERY_TERMINAL_HEIGHT) / 2);
+            + ((BatteryStripeStyle.BODY_HEIGHT - BatteryStripeStyle.TERMINAL_HEIGHT) / 2);
         dc.setColor(foregroundColor, foregroundColor);
         dc.fillRectangle(
             terminalX,
             terminalY,
-            TimeTileStyle.BATTERY_TERMINAL_WIDTH,
-            TimeTileStyle.BATTERY_TERMINAL_HEIGHT
+            BatteryStripeStyle.TERMINAL_WIDTH,
+            BatteryStripeStyle.TERMINAL_HEIGHT
         );
     }
 
     function getRowText(rowIndex as Number) as String or Null {
-        if (rowIndex != 1) {
+        if (rowIndex != StripeElementLayout.ROW_BOTTOM) {
             return null;
         }
         return batteryPercentage().format("%d") + "%";
