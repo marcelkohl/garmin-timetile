@@ -17,6 +17,14 @@ SETTINGS_SRC   := resources/settings/settings.xml
 SETTINGS_DEST  := GARMIN/Settings/$(APP_NAME)_$(DEVICE)-settings.json
 JUNGLE         := monkey.jungle
 
+# SVG → PNG icon pipeline (host ImageMagick; generated PNGs are not committed).
+ICON_SRC       := assets/icons-src/steps.svg
+ICON_GEN_DIR   := resources/drawables/generated
+ICON_BLACK     := $(ICON_GEN_DIR)/steps_black.png
+ICON_WHITE     := $(ICON_GEN_DIR)/steps_white.png
+ICON_SIZE      := 16
+CONVERT        := $(shell command -v convert 2>/dev/null)
+
 # Resolve active SDK path from current-sdk.cfg (supports SDK root or .../bin).
 SDK_PATH_RAW := $(shell tr -d '\r\n' < "$(SDK_CFG)" 2>/dev/null | sed 's:/*$$::')
 ifeq ($(notdir $(SDK_PATH_RAW)),bin)
@@ -38,7 +46,7 @@ define in_container
 distrobox enter "$(CONTAINER)" -- bash --noprofile --norc -c $(1)
 endef
 
-.PHONY: help check build clean simulator run
+.PHONY: help check assets build clean simulator run
 
 help:
 	@echo "Time Tile — Connect IQ watch face"
@@ -46,8 +54,9 @@ help:
 	@echo "Targets:"
 	@echo "  help       List available targets"
 	@echo "  check      Verify Distrobox, SDK tools, device package, and developer key"
-	@echo "  build      Compile and sign a debug .prg for $(DEVICE)"
-	@echo "  clean      Remove project-generated build artifacts"
+	@echo "  assets     Generate PNG icons from SVG sources (host ImageMagick)"
+	@echo "  build      Generate assets, then compile and sign a debug .prg for $(DEVICE)"
+	@echo "  clean      Remove build/ and generated icon PNGs"
 	@echo "  simulator  Start the Connect IQ simulator inside the container"
 	@echo "  run        Build and launch the .prg on the simulator for $(DEVICE)"
 	@echo ""
@@ -102,7 +111,32 @@ check:
 	fi; \
 	exit $$status
 
-build: check
+# Generate white/black PNG variants from the single Steps SVG (host-side).
+assets: $(ICON_WHITE) $(ICON_BLACK)
+	@echo "OK: generated $(ICON_BLACK) and $(ICON_WHITE)"
+
+$(ICON_GEN_DIR):
+	@mkdir -p "$(ICON_GEN_DIR)"
+
+$(ICON_BLACK): $(ICON_SRC) | $(ICON_GEN_DIR)
+	@if [ -z "$(CONVERT)" ]; then \
+		echo "ERROR: ImageMagick 'convert' not found on PATH."; \
+		echo "Install on Ubuntu: sudo apt install imagemagick"; \
+		echo "Preferred alternative: sudo apt install librsvg2-bin  (rsvg-convert)"; \
+		exit 1; \
+	fi
+	@echo "Generating $(ICON_BLACK) ($(ICON_SIZE)x$(ICON_SIZE)) from $(ICON_SRC)..."
+	@"$(CONVERT)" -background none -size $(ICON_SIZE)x$(ICON_SIZE) "$(ICON_SRC)" PNG32:"$(ICON_BLACK)"
+	@identify -format '%wx%h' "$(ICON_BLACK)" | grep -qx '$(ICON_SIZE)x$(ICON_SIZE)' \
+		|| (echo "ERROR: $(ICON_BLACK) is not $(ICON_SIZE)x$(ICON_SIZE)"; exit 1)
+
+$(ICON_WHITE): $(ICON_BLACK)
+	@echo "Generating $(ICON_WHITE) from $(ICON_BLACK)..."
+	@"$(CONVERT)" "$(ICON_BLACK)" -channel RGB -negate +channel PNG32:"$(ICON_WHITE)"
+	@identify -format '%wx%h' "$(ICON_WHITE)" | grep -qx '$(ICON_SIZE)x$(ICON_SIZE)' \
+		|| (echo "ERROR: $(ICON_WHITE) is not $(ICON_SIZE)x$(ICON_SIZE)"; exit 1)
+
+build: check assets
 	@mkdir -p "$(BUILD_DIR)"
 	@echo "Compiling $(APP_NAME) for $(DEVICE)..."
 	@echo "Compiler command:"
@@ -118,7 +152,8 @@ build: check
 
 clean:
 	@rm -rf "$(BUILD_DIR)"
-	@echo "OK: removed $(BUILD_DIR)/"
+	@rm -f "$(ICON_BLACK)" "$(ICON_WHITE)"
+	@echo "OK: removed $(BUILD_DIR)/ and generated icon PNGs"
 
 simulator:
 	@echo "Starting Connect IQ simulator in container '$(CONTAINER)'..."

@@ -15,6 +15,9 @@ gen/
 bin/
 output/
 
+# Generated icon bitmaps (edit SVG under assets/icons-src/; run make assets)
+resources/drawables/generated/*.png
+
 # Developer keys — never commit these
 *.der
 *.pem

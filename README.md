@@ -60,8 +60,9 @@ listed in `.gitignore` and must stay outside version control.
 |--------|-------------|
 | `make help` | List targets |
 | `make check` | Verify Distrobox, SDK, device package, and developer key |
-| `make build` | Compile and sign a debug `.prg` for `fr55` |
-| `make clean` | Delete `build/` artifacts only |
+| `make assets` | Generate PNG icons from SVG sources (host ImageMagick) |
+| `make build` | Generate assets, then compile and sign a debug `.prg` for `fr55` |
+| `make clean` | Delete `build/` and generated icon PNGs |
 | `make simulator` | Start the Connect IQ simulator (inside the container) |
 | `make run` | Build and launch the `.prg` in the simulator |
 
@@ -74,6 +75,21 @@ make build SDK_CFG="$HOME/.Garmin/ConnectIQ/current-sdk.cfg"
 make build DEVELOPER_KEY="$HOME/.config/garmin-connect-iq/developer_key.der"
 ```
 
+## Icon assets
+
+SVG files under `assets/icons-src/` are the editable source of truth. Connect IQ
+does not render SVG at runtime — `make assets` converts them to transparent
+16×16 PNG bitmaps under `resources/drawables/generated/` (white and black
+variants for the stripe foreground setting).
+
+- Run `make assets` after editing an SVG.
+- `make build` / `make run` generate assets automatically.
+- Keep icons simple and readable at 16×16 (solid shapes, no gradients/filters).
+- Generated PNGs are gitignored; commit the SVG only.
+
+Requires ImageMagick `convert` on the host (`sudo apt install imagemagick`).
+Preferred longer-term converter: `rsvg-convert` from `librsvg2-bin`.
+
 ## Project structure
 
 ```text
@@ -82,10 +98,14 @@ make build DEVELOPER_KEY="$HOME/.config/garmin-connect-iq/developer_key.der"
 ├── README.md
 ├── docs/
 │   └── ubuntu-24.04-setup.md
+├── assets/
+│   └── icons-src/          (editable SVG sources)
 ├── manifest.xml
 ├── monkey.jungle
 ├── resources/
 │   ├── drawables/
+│   │   └── generated/      (PNG output; gitignored)
+│   ├── settings/
 │   └── strings/
 ├── source/
 │   ├── TimeTileApp.mc

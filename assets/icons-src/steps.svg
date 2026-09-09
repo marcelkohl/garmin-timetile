@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+  <!-- Provisional monochrome footprints; editable source for build-time PNG generation. -->
+  <!-- Left footprint -->
+  <ellipse cx="5" cy="5" rx="2.2" ry="3.3" fill="#000000"/>
+  <ellipse cx="4.3" cy="10.2" rx="1.6" ry="2.1" fill="#000000"/>
+  <!-- Right footprint -->
+  <ellipse cx="11" cy="7" rx="2.2" ry="3.3" fill="#000000"/>
+  <ellipse cx="11.7" cy="12.2" rx="1.6" ry="2.1" fill="#000000"/>
+</svg>
