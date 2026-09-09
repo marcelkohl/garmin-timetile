@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="30" height="16" viewBox="0 0 30 16">
+<svg xmlns="http://www.w3.org/2000/svg" width="30" height="18" viewBox="0 0 30 18">
   <!-- Provisional outlined calendar body; transparent interior; no embedded text. -->
   <path fill="#000000" fill-rule="evenodd"
-        d="M2 2h26v12H2zM4 4h22v8H4z"/>
+        d="M2 2h26v14H2zM4 4h22v10H4z"/>
 </svg>

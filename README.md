@@ -83,8 +83,9 @@ bitmaps under `resources/drawables/generated/` (white and black variants).
 
 - **Steps:** one SVG icon (`steps.svg`, 16×16).
 - **Calendar:** separate top-row and bottom-row SVG backgrounds
-  (`calendar_top.svg`, `calendar_bottom.svg`, 30×16); weekday/day text stays
-  dynamic and is overlaid at runtime.
+  (`calendar_top.svg`, `calendar_bottom.svg`, 30×18); weekday/day text stays
+  dynamic and is overlaid at runtime. Bitmap size is Calendar-local; rows stay
+  derived from stripe geometry.
 - Run `make assets` after editing an SVG.
 - `make build` / `make run` generate assets automatically.
 - Keep shapes simple and readable at these sizes (no gradients/filters).

@@ -159,16 +159,16 @@ $(STEPS_WHITE): $(STEPS_BLACK)
 	$(call negate_to_white,$(STEPS_BLACK),$(STEPS_WHITE),16,16)
 
 $(CAL_TOP_BLACK): $(CALENDAR_TOP_SVG) | $(ICON_GEN_DIR)
-	$(call render_svg_black,$(CALENDAR_TOP_SVG),$(CAL_TOP_BLACK),30,16)
+	$(call render_svg_black,$(CALENDAR_TOP_SVG),$(CAL_TOP_BLACK),30,18)
 
 $(CAL_TOP_WHITE): $(CAL_TOP_BLACK)
-	$(call negate_to_white,$(CAL_TOP_BLACK),$(CAL_TOP_WHITE),30,16)
+	$(call negate_to_white,$(CAL_TOP_BLACK),$(CAL_TOP_WHITE),30,18)
 
 $(CAL_BOTTOM_BLACK): $(CALENDAR_BOTTOM_SVG) | $(ICON_GEN_DIR)
-	$(call render_svg_black,$(CALENDAR_BOTTOM_SVG),$(CAL_BOTTOM_BLACK),30,16)
+	$(call render_svg_black,$(CALENDAR_BOTTOM_SVG),$(CAL_BOTTOM_BLACK),30,18)
 
 $(CAL_BOTTOM_WHITE): $(CAL_BOTTOM_BLACK)
-	$(call negate_to_white,$(CAL_BOTTOM_BLACK),$(CAL_BOTTOM_WHITE),30,16)
+	$(call negate_to_white,$(CAL_BOTTOM_BLACK),$(CAL_BOTTOM_WHITE),30,18)
 
 build: check assets
 	@mkdir -p "$(BUILD_DIR)"
