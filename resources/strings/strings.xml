@@ -10,4 +10,16 @@
     <string id="ElementBattery">Battery</string>
     <string id="ElementCalendar">Calendar</string>
     <string id="ElementSteps">Steps</string>
+
+    <string id="StripeColorTitle">Stripe color</string>
+    <string id="ElementColorTitle">Element color</string>
+
+    <string id="ColorBlue">Blue</string>
+    <string id="ColorRed">Red</string>
+    <string id="ColorGreen">Green</string>
+    <string id="ColorYellow">Yellow</string>
+    <string id="ColorOrange">Orange</string>
+    <string id="ColorPurple">Purple</string>
+    <string id="ColorWhite">White</string>
+    <string id="ColorBlack">Black</string>
 </strings>

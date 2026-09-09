@@ -12,7 +12,7 @@ class TimeTileView extends WatchUi.WatchFace {
         _stripePanel = new StripePanel(StripeConfiguration.elementIds());
     }
 
-    // Recreate stripe element instances from current application properties.
+    // Reload slot selection and stripe appearance from application properties.
     // Called from AppBase.onSettingsChanged — not from onUpdate.
     function reloadStripeConfiguration() as Void {
         _stripePanel = new StripePanel(StripeConfiguration.elementIds());

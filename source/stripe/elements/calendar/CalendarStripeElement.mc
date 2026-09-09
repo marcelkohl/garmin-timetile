@@ -14,7 +14,8 @@ class CalendarStripeElement extends StripeElement {
         dc as Dc,
         rowIndex as Number,
         rowBounds as Array<Number>,
-        foregroundColor as Number
+        foregroundColor as Number,
+        backgroundColor as Number
     ) as Void {
         var inset = StripeElementLayout.ROW_ICON_INSET;
         var outline = CalendarStripeStyle.OUTLINE_THICKNESS;
@@ -28,12 +29,12 @@ class CalendarStripeElement extends StripeElement {
         }
 
         if (rowIndex == StripeElementLayout.ROW_TOP) {
-            // Filled header; weekday uses stripe color for contrast on foreground fill.
+            // Filled header; weekday uses stripe background for contrast on foreground fill.
             dc.setColor(foregroundColor, foregroundColor);
             dc.fillRectangle(x, y, width, height);
 
             var info = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
-            dc.setColor(TimeTileStyle.STRIPE_COLOR, Graphics.COLOR_TRANSPARENT);
+            dc.setColor(backgroundColor, Graphics.COLOR_TRANSPARENT);
             dc.drawText(
                 rowBounds[0] + (rowBounds[2] / 2),
                 rowBounds[1] + (rowBounds[3] / 2),
@@ -47,7 +48,7 @@ class CalendarStripeElement extends StripeElement {
         if (rowIndex == StripeElementLayout.ROW_BOTTOM) {
             dc.setColor(foregroundColor, foregroundColor);
             dc.fillRectangle(x, y, width, height);
-            dc.setColor(TimeTileStyle.STRIPE_COLOR, TimeTileStyle.STRIPE_COLOR);
+            dc.setColor(backgroundColor, backgroundColor);
             if ((width > outline * 2) && (height > outline * 2)) {
                 dc.fillRectangle(
                     x + outline,

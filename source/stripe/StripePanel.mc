@@ -7,11 +7,13 @@ class StripePanel {
     private var _elements as Array<StripeElement>;
     private var _centerX as Number;
     private var _slotCenterYs as Array<Number>;
+    private var _stripeColor as Number;
     private var _foregroundColor as Number;
 
     function initialize(elementIds as Array<Number>) {
         _centerX = TimeTileStyle.STRIPE_CONTENT_CENTER_X;
-        _foregroundColor = TimeTileStyle.STRIPE_FOREGROUND_COLOR;
+        _stripeColor = StripeAppearanceConfiguration.stripeColor();
+        _foregroundColor = StripeAppearanceConfiguration.stripeForegroundColor();
         _slotCenterYs = [
             TimeTileStyle.TOP_SLOT_CENTER_Y,
             TimeTileStyle.MIDDLE_SLOT_CENTER_Y,
@@ -41,7 +43,7 @@ class StripePanel {
     }
 
     function draw(dc as Dc) as Void {
-        dc.setColor(TimeTileStyle.STRIPE_COLOR, TimeTileStyle.STRIPE_COLOR);
+        dc.setColor(_stripeColor, _stripeColor);
         dc.fillRectangle(
             TimeTileStyle.STRIPE_LEFT_X,
             TimeTileStyle.STRIPE_TOP_Y,
@@ -54,7 +56,8 @@ class StripePanel {
                 dc,
                 _centerX,
                 _slotCenterYs[i],
-                _foregroundColor
+                _foregroundColor,
+                _stripeColor
             );
         }
     }

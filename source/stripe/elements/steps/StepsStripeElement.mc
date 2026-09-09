@@ -13,7 +13,8 @@ class StepsStripeElement extends StripeElement {
         dc as Dc,
         rowIndex as Number,
         rowBounds as Array<Number>,
-        foregroundColor as Number
+        foregroundColor as Number,
+        backgroundColor as Number
     ) as Void {
         if (rowIndex != StripeElementLayout.ROW_TOP) {
             return;

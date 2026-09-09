@@ -13,7 +13,8 @@ class BatteryStripeElement extends StripeElement {
         dc as Dc,
         rowIndex as Number,
         rowBounds as Array<Number>,
-        foregroundColor as Number
+        foregroundColor as Number,
+        backgroundColor as Number
     ) as Void {
         if (rowIndex != StripeElementLayout.ROW_TOP) {
             return;
@@ -43,7 +44,7 @@ class BatteryStripeElement extends StripeElement {
             BatteryStripeStyle.BODY_HEIGHT
         );
 
-        dc.setColor(TimeTileStyle.STRIPE_COLOR, TimeTileStyle.STRIPE_COLOR);
+        dc.setColor(backgroundColor, backgroundColor);
         dc.fillRectangle(innerX, innerY, innerWidth, innerHeight);
 
         if (fillWidth > 0) {

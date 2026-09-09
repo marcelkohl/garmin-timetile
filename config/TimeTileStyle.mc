@@ -33,19 +33,16 @@ module TimeTileStyle {
     const MINUTE_CLIP_WIDTH = TIME_AREA_RIGHT - TIME_AREA_LEFT;
     const MINUTE_CLIP_HEIGHT = SCREEN_CENTER_Y;
 
-    // Plain vertical stripe rectangle (user-tuned).
-    const STRIPE_COLOR = Graphics.COLOR_BLUE;
-    const STRIPE_LEFT_X = 145;
+    // Plain vertical stripe geometry (user-tuned).
+    // Runtime stripe/element colors come from StripeAppearanceConfiguration.
+    const STRIPE_LEFT_X = 140;
     const STRIPE_TOP_Y = 0;
-    const STRIPE_WIDTH = 55;
+    const STRIPE_WIDTH = 60;
     const STRIPE_HEIGHT = 250;
 
     // Stripe content slots — horizontal center derived from stripe geometry.
-    const STRIPE_CONTENT_CENTER_X = STRIPE_LEFT_X + ((STRIPE_WIDTH * 2) / 5);
+    const STRIPE_CONTENT_CENTER_X = STRIPE_LEFT_X + ((STRIPE_WIDTH * 2) / 4);
     const TOP_SLOT_CENTER_Y = 48;
     const MIDDLE_SLOT_CENTER_Y = 104;
     const BOTTOM_SLOT_CENTER_Y = 160;
-
-    // Default stripe element foreground (later: user setting white/black only).
-    const STRIPE_FOREGROUND_COLOR = Graphics.COLOR_WHITE;
 }

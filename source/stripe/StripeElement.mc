@@ -9,12 +9,14 @@ class StripeElement {
     function initialize() {
     }
 
-    // Draw this element centered at (centerX, centerY) using foregroundColor.
+    // Draw this element centered at (centerX, centerY).
+    // foregroundColor: icon/text color; backgroundColor: stripe fill for contrast.
     function draw(
         dc as Dc,
         centerX as Number,
         centerY as Number,
-        foregroundColor as Number
+        foregroundColor as Number,
+        backgroundColor as Number
     ) as Void {
         var width = StripeElementLayout.ELEMENT_WIDTH;
         var rowHeight = StripeElementLayout.ROW_HEIGHT;
@@ -22,7 +24,7 @@ class StripeElement {
         var elementY = centerY - (StripeElementLayout.ELEMENT_HEIGHT / 2);
 
         var topBounds = [elementX, elementY, width, rowHeight] as Array<Number>;
-        drawBoundedRow(dc, StripeElementLayout.ROW_TOP, topBounds, foregroundColor);
+        drawBoundedRow(dc, StripeElementLayout.ROW_TOP, topBounds, foregroundColor, backgroundColor);
 
         var bottomBounds = [
             elementX,
@@ -30,7 +32,7 @@ class StripeElement {
             width,
             rowHeight
         ] as Array<Number>;
-        drawBoundedRow(dc, StripeElementLayout.ROW_BOTTOM, bottomBounds, foregroundColor);
+        drawBoundedRow(dc, StripeElementLayout.ROW_BOTTOM, bottomBounds, foregroundColor, backgroundColor);
     }
 
     // rowBounds = [x, y, width, height]
@@ -38,7 +40,8 @@ class StripeElement {
         dc as Dc,
         rowIndex as Number,
         rowBounds as Array<Number>,
-        foregroundColor as Number
+        foregroundColor as Number,
+        backgroundColor as Number
     ) as Void {
         var x = rowBounds[0];
         var y = rowBounds[1];
@@ -46,7 +49,7 @@ class StripeElement {
         var height = rowBounds[3];
 
         dc.setClip(x, y, width, height);
-        drawRowIcon(dc, rowIndex, rowBounds, foregroundColor);
+        drawRowIcon(dc, rowIndex, rowBounds, foregroundColor, backgroundColor);
 
         var text = getRowText(rowIndex);
         if ((text != null) && (text.length() > 0)) {
@@ -72,7 +75,8 @@ class StripeElement {
         dc as Dc,
         rowIndex as Number,
         rowBounds as Array<Number>,
-        foregroundColor as Number
+        foregroundColor as Number,
+        backgroundColor as Number
     ) as Void {
     }
 
