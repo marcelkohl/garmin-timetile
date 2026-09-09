@@ -56,4 +56,12 @@ module TimeTileStyle {
     const BATTERY_TERMINAL_HEIGHT = 6;
     const BATTERY_TEXT_FONT = Graphics.FONT_XTINY;
     const BATTERY_TEXT_GAP = 4;
+
+    // Calendar icon geometry (geometric primitives).
+    const CALENDAR_WIDTH = 30;
+    const CALENDAR_HEIGHT = 30;
+    const CALENDAR_HEADER_HEIGHT = 11;
+    const CALENDAR_OUTLINE_THICKNESS = 2;
+    const CALENDAR_WEEKDAY_FONT = Graphics.FONT_XTINY;
+    const CALENDAR_DATE_FONT = Graphics.FONT_XTINY;
 }

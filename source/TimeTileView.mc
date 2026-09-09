@@ -11,7 +11,7 @@ class TimeTileView extends WatchUi.WatchFace {
         WatchFace.initialize();
         _stripePanel = new StripePanel([
             StripeElementRegistry.BATTERY,
-            StripeElementRegistry.NONE,
+            StripeElementRegistry.CALENDAR,
             StripeElementRegistry.NONE
         ] as Array<Number>);
     }
