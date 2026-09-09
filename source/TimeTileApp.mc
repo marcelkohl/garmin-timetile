@@ -4,6 +4,8 @@ import Toybox.WatchUi;
 
 class TimeTileApp extends Application.AppBase {
 
+    private var _view as TimeTileView?;
+
     function initialize() {
         AppBase.initialize();
     }
@@ -15,6 +17,15 @@ class TimeTileApp extends Application.AppBase {
     }
 
     function getInitialView() as [Views] or [Views, InputDelegates] {
-        return [new $.TimeTileView()];
+        _view = new $.TimeTileView();
+        return [_view];
+    }
+
+    // Garmin Connect Mobile / Express can change settings while the watchface runs.
+    function onSettingsChanged() as Void {
+        if (_view != null) {
+            (_view as TimeTileView).reloadStripeConfiguration();
+        }
+        WatchUi.requestUpdate();
     }
 }

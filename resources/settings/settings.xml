@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://developer.garmin.com/downloads/connect-iq/resources.xsd">
+
+    <setting propertyKey="@Properties.topStripeElement" title="@Strings.TopStripeElementTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.ElementNone</listEntry>
+            <listEntry value="1">@Strings.ElementBattery</listEntry>
+            <listEntry value="2">@Strings.ElementCalendar</listEntry>
+            <listEntry value="3">@Strings.ElementSteps</listEntry>
+        </settingConfig>
+    </setting>
+
+    <setting propertyKey="@Properties.middleStripeElement" title="@Strings.MiddleStripeElementTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.ElementNone</listEntry>
+            <listEntry value="1">@Strings.ElementBattery</listEntry>
+            <listEntry value="2">@Strings.ElementCalendar</listEntry>
+            <listEntry value="3">@Strings.ElementSteps</listEntry>
+        </settingConfig>
+    </setting>
+
+    <setting propertyKey="@Properties.bottomStripeElement" title="@Strings.BottomStripeElementTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.ElementNone</listEntry>
+            <listEntry value="1">@Strings.ElementBattery</listEntry>
+            <listEntry value="2">@Strings.ElementCalendar</listEntry>
+            <listEntry value="3">@Strings.ElementSteps</listEntry>
+        </settingConfig>
+    </setting>
+
+</settings>

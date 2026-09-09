@@ -12,6 +12,12 @@ class TimeTileView extends WatchUi.WatchFace {
         _stripePanel = new StripePanel(StripeConfiguration.elementIds());
     }
 
+    // Recreate stripe element instances from current application properties.
+    // Called from AppBase.onSettingsChanged — not from onUpdate.
+    function reloadStripeConfiguration() as Void {
+        _stripePanel = new StripePanel(StripeConfiguration.elementIds());
+    }
+
     function onUpdate(dc as Dc) as Void {
         dc.setColor(TimeTileStyle.BACKGROUND_COLOR, TimeTileStyle.BACKGROUND_COLOR);
         dc.clear();

@@ -10,6 +10,11 @@ DEVICES_DIR    ?= $(HOME)/.Garmin/ConnectIQ/Devices
 BUILD_DIR      := build
 APP_NAME       := TimeTile
 PRG            := $(BUILD_DIR)/$(APP_NAME)_$(DEVICE).prg
+# monkeyc writes this next to the .prg when resources/settings/settings.xml is present.
+SETTINGS_JSON  := $(BUILD_DIR)/$(APP_NAME)_$(DEVICE)-settings.json
+SETTINGS_SRC   := resources/settings/settings.xml
+# Simulator virtual path required by App Settings Editor (monkeydo -a source:dest).
+SETTINGS_DEST  := GARMIN/Settings/$(APP_NAME)_$(DEVICE)-settings.json
 JUNGLE         := monkey.jungle
 
 # Resolve active SDK path from current-sdk.cfg (supports SDK root or .../bin).
@@ -120,5 +125,16 @@ simulator:
 	@$(call in_container,"'$(CONNECTIQ)'")
 
 run: build
+	@if [ -f "$(SETTINGS_SRC)" ] && [ ! -f "$(SETTINGS_JSON)" ]; then \
+		echo "ERROR: Settings JSON not found. Run make build and verify $(SETTINGS_SRC)."; \
+		echo "Expected: $(SETTINGS_JSON)"; \
+		exit 1; \
+	fi
 	@echo "Launching $(PRG) on $(DEVICE)..."
-	@$(call in_container,"'$(MONKEYDO)' '$(CURDIR)/$(PRG)' '$(DEVICE)'")
+	@if [ -f "$(SETTINGS_JSON)" ]; then \
+		echo "  $(MONKEYDO) $(PRG) $(DEVICE) -a \"$(SETTINGS_JSON):$(SETTINGS_DEST)\""; \
+		$(call in_container,"'$(MONKEYDO)' '$(CURDIR)/$(PRG)' '$(DEVICE)' -a '$(CURDIR)/$(SETTINGS_JSON):$(SETTINGS_DEST)'"); \
+	else \
+		echo "  $(MONKEYDO) $(PRG) $(DEVICE)"; \
+		$(call in_container,"'$(MONKEYDO)' '$(CURDIR)/$(PRG)' '$(DEVICE)'"); \
+	fi
