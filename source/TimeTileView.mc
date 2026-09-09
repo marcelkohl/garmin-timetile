@@ -12,7 +12,7 @@ class TimeTileView extends WatchUi.WatchFace {
         _stripePanel = new StripePanel([
             StripeElementRegistry.BATTERY,
             StripeElementRegistry.CALENDAR,
-            StripeElementRegistry.NONE
+            StripeElementRegistry.STEPS
         ] as Array<Number>);
     }
 

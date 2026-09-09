@@ -64,4 +64,15 @@ module TimeTileStyle {
     const CALENDAR_OUTLINE_THICKNESS = 2;
     const CALENDAR_WEEKDAY_FONT = Graphics.FONT_XTINY;
     const CALENDAR_DATE_FONT = Graphics.FONT_XTINY;
+
+    // Steps icon geometry (provisional).
+    const STEPS_TEXT_FONT = Graphics.FONT_XTINY;
+    const STEPS_TEXT_OFFSET_Y = 14;
+
+    // Two footprints as simple filled slanted parallelograms.
+    const STEPS_FOOTPRINT_WIDTH = 12;
+    const STEPS_FOOTPRINT_HEIGHT = 8;
+    const STEPS_FOOTPRINT_SLANT = 2;
+    const STEPS_FOOTPRINT_CENTER_OFFSET_X = 4;
+    const STEPS_FOOTPRINT_VERTICAL_OFFSET = 4;
 }
