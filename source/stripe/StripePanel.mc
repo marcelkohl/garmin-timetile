@@ -63,6 +63,36 @@ class StripePanel {
         return anyChanged;
     }
 
+    // Low-power path: refresh/redraw only capability-opted slots whose visible
+    // cached state changed. Uses one tight clip per due slot (never a union).
+    function onPartialUpdate(dc as Dc, nowSeconds as Number) as Void {
+        var stripeWidth = TimeTileStyle.STRIPE_WIDTH;
+        var size = StripeElementLayout.elementSize(stripeWidth);
+        var halfSize = size / 2;
+
+        for (var i = 0; i < _elements.size(); i += 1) {
+            var element = _elements[i] as StripeElement;
+            if (!element.supportsPartialUpdates()) {
+                continue;
+            }
+            // refreshIfDue: false when not due, or due but visible state unchanged.
+            if (!element.refreshIfDue(nowSeconds)) {
+                continue;
+            }
+
+            var centerY = _blockCenterYs[i];
+            var blockX = _centerX - halfSize;
+            var blockY = centerY - halfSize;
+
+            dc.setClip(blockX, blockY, size, size);
+            dc.setColor(_stripeColor, _stripeColor);
+            dc.fillRectangle(blockX, blockY, size, size);
+            element.draw(dc, _centerX, centerY, _foregroundColor, _stripeColor);
+        }
+
+        dc.clearClip();
+    }
+
     function draw(dc as Dc) as Void {
         dc.setColor(_stripeColor, _stripeColor);
         dc.fillRectangle(

@@ -19,7 +19,25 @@ class TimeTileView extends WatchUi.WatchFace {
         _stripePanel = new StripePanel(StripeConfiguration.elementIds());
     }
 
+    function onEnterSleep() as Void {
+        // Documented Analog pattern: one full render before low-power partials.
+        WatchUi.requestUpdate();
+    }
+
+    function onExitSleep() as Void {
+        // Catch up caches and full layout after leaving low power.
+        WatchUi.requestUpdate();
+    }
+
+    function onPartialUpdate(dc as Dc) as Void {
+        var nowSeconds = Time.now().value();
+        _stripePanel.onPartialUpdate(dc, nowSeconds);
+    }
+
     function onUpdate(dc as Dc) as Void {
+        // Clear any clip left from a prior partial update before full redraw.
+        dc.clearClip();
+
         var nowSeconds = Time.now().value();
         _stripePanel.refreshElementsIfDue(nowSeconds);
 

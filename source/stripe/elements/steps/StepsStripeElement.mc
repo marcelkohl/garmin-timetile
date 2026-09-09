@@ -24,6 +24,10 @@ class StepsStripeElement extends StripeElement {
         return StepsStripeStyle.REFRESH_INTERVAL_SECONDS;
     }
 
+    function supportsPartialUpdates() as Boolean {
+        return true;
+    }
+
     function refreshData() as Boolean {
         var info = ActivityMonitor.getInfo();
         var steps = info.steps;

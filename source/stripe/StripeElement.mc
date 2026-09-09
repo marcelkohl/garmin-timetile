@@ -35,6 +35,12 @@ class StripeElement {
         return 0;
     }
 
+    // Whether this element may refresh/redraw during WatchFace.onPartialUpdate.
+    // Default false — only high-frequency elements (e.g. Steps) opt in.
+    function supportsPartialUpdates() as Boolean {
+        return false;
+    }
+
     private function isRefreshDue(nowSeconds as Number) as Boolean {
         if (_lastRefreshSeconds == null) {
             return true;

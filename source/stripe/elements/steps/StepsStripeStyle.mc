@@ -9,6 +9,6 @@ module StepsStripeStyle {
     const COMPACT_THRESHOLD = 1000;
 
     // Code-level refresh policy (not a user setting).
-    // Does not guarantee 5-second watchface wakeups — only refreshes when onUpdate runs.
+    // Authoritative Steps interval for both full onUpdate and low-power onPartialUpdate.
     const REFRESH_INTERVAL_SECONDS = 5;
 }

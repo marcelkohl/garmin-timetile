@@ -18,6 +18,9 @@ class TimeTileApp extends Application.AppBase {
 
     function getInitialView() as [Views] or [Views, InputDelegates] {
         _view = new $.TimeTileView();
+        if (WatchUi has :WatchFaceDelegate) {
+            return [_view, new $.TimeTileDelegate()];
+        }
         return [_view];
     }
 
