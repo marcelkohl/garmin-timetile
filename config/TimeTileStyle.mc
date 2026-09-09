@@ -32,10 +32,26 @@ module TimeTileStyle {
     const MINUTE_CLIP_WIDTH = TIME_AREA_RIGHT - TIME_AREA_LEFT;
     const MINUTE_CLIP_HEIGHT = SCREEN_CENTER_Y;
 
-    // Plain vertical stripe rectangle.
+    // Plain vertical stripe rectangle (user-tuned).
     const STRIPE_COLOR = Graphics.COLOR_BLUE;
     const STRIPE_LEFT_X = 145;
     const STRIPE_TOP_Y = 0;
     const STRIPE_WIDTH = 55;
     const STRIPE_HEIGHT = 250;
+
+    // Stripe content slots — horizontal center derived from stripe geometry.
+    const STRIPE_CONTENT_CENTER_X = STRIPE_LEFT_X + ((STRIPE_WIDTH * 2) / 5);
+    const TOP_SLOT_CENTER_Y = 48;
+    const MIDDLE_SLOT_CENTER_Y = 104;
+    const BOTTOM_SLOT_CENTER_Y = 160;
+
+    // Top-slot battery icon (geometric primitives).
+    const BATTERY_COLOR = Graphics.COLOR_WHITE;
+    const BATTERY_BODY_WIDTH = 24;
+    const BATTERY_BODY_HEIGHT = 12;
+    const BATTERY_OUTLINE_THICKNESS = 2;
+    const BATTERY_TERMINAL_WIDTH = 3;
+    const BATTERY_TERMINAL_HEIGHT = 6;
+    const BATTERY_TEXT_FONT = Graphics.FONT_XTINY;
+    const BATTERY_TEXT_GAP = 4;
 }

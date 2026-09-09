@@ -14,6 +14,7 @@ class TimeTileView extends WatchUi.WatchFace {
         dc.clear();
 
         drawStripe(dc);
+        drawBattery(dc, batteryPercentage());
 
         var timeCenterX = TimeTileStyle.TIME_AREA_LEFT
             + ((TimeTileStyle.TIME_AREA_RIGHT - TimeTileStyle.TIME_AREA_LEFT) / 2);
@@ -63,6 +64,69 @@ class TimeTileView extends WatchUi.WatchFace {
             TimeTileStyle.STRIPE_TOP_Y,
             TimeTileStyle.STRIPE_WIDTH,
             TimeTileStyle.STRIPE_HEIGHT
+        );
+    }
+
+    private function batteryPercentage() as Number {
+        var percentage = System.getSystemStats().battery.toNumber();
+        if (percentage < 0) {
+            return 0;
+        }
+        if (percentage > 100) {
+            return 100;
+        }
+        return percentage;
+    }
+
+    private function drawBattery(dc as Dc, percentage as Number) as Void {
+        var totalWidth = TimeTileStyle.BATTERY_BODY_WIDTH + TimeTileStyle.BATTERY_TERMINAL_WIDTH;
+        var bodyX = TimeTileStyle.STRIPE_CONTENT_CENTER_X - (totalWidth / 2);
+        var bodyY = TimeTileStyle.TOP_SLOT_CENTER_Y - (TimeTileStyle.BATTERY_BODY_HEIGHT / 2);
+        var outline = TimeTileStyle.BATTERY_OUTLINE_THICKNESS;
+        var innerX = bodyX + outline;
+        var innerY = bodyY + outline;
+        var innerWidth = TimeTileStyle.BATTERY_BODY_WIDTH - (outline * 2);
+        var innerHeight = TimeTileStyle.BATTERY_BODY_HEIGHT - (outline * 2);
+        var fillWidth = (innerWidth * percentage) / 100;
+
+        // White body, then restore stripe color inside to form the outline frame.
+        dc.setColor(TimeTileStyle.BATTERY_COLOR, TimeTileStyle.BATTERY_COLOR);
+        dc.fillRectangle(
+            bodyX,
+            bodyY,
+            TimeTileStyle.BATTERY_BODY_WIDTH,
+            TimeTileStyle.BATTERY_BODY_HEIGHT
+        );
+
+        dc.setColor(TimeTileStyle.STRIPE_COLOR, TimeTileStyle.STRIPE_COLOR);
+        dc.fillRectangle(innerX, innerY, innerWidth, innerHeight);
+
+        if (fillWidth > 0) {
+            dc.setColor(TimeTileStyle.BATTERY_COLOR, TimeTileStyle.BATTERY_COLOR);
+            dc.fillRectangle(innerX, innerY, fillWidth, innerHeight);
+        }
+
+        var terminalX = bodyX + TimeTileStyle.BATTERY_BODY_WIDTH;
+        var terminalY = bodyY
+            + ((TimeTileStyle.BATTERY_BODY_HEIGHT - TimeTileStyle.BATTERY_TERMINAL_HEIGHT) / 2);
+        dc.setColor(TimeTileStyle.BATTERY_COLOR, TimeTileStyle.BATTERY_COLOR);
+        dc.fillRectangle(
+            terminalX,
+            terminalY,
+            TimeTileStyle.BATTERY_TERMINAL_WIDTH,
+            TimeTileStyle.BATTERY_TERMINAL_HEIGHT
+        );
+
+        var labelY = bodyY
+            + TimeTileStyle.BATTERY_BODY_HEIGHT
+            + TimeTileStyle.BATTERY_TEXT_GAP;
+        dc.setColor(TimeTileStyle.BATTERY_COLOR, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(
+            TimeTileStyle.STRIPE_CONTENT_CENTER_X,
+            labelY,
+            TimeTileStyle.BATTERY_TEXT_FONT,
+            percentage.format("%d") + "%",
+            Graphics.TEXT_JUSTIFY_CENTER
         );
     }
 
