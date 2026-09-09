@@ -45,8 +45,10 @@ module TimeTileStyle {
     const MIDDLE_SLOT_CENTER_Y = 104;
     const BOTTOM_SLOT_CENTER_Y = 160;
 
-    // Top-slot battery icon (geometric primitives).
-    const BATTERY_COLOR = Graphics.COLOR_WHITE;
+    // Default stripe element foreground (later: user setting white/black only).
+    const STRIPE_FOREGROUND_COLOR = Graphics.COLOR_WHITE;
+
+    // Battery icon geometry (geometric primitives).
     const BATTERY_BODY_WIDTH = 24;
     const BATTERY_BODY_HEIGHT = 12;
     const BATTERY_OUTLINE_THICKNESS = 2;
