@@ -24,6 +24,7 @@ CONVERT        := $(shell command -v convert 2>/dev/null)
 STEPS_SVG            := assets/icons-src/steps.svg
 CALENDAR_TOP_SVG     := assets/icons-src/calendar_top.svg
 CALENDAR_BOTTOM_SVG  := assets/icons-src/calendar_bottom.svg
+BATTERY_FRAME_SVG    := assets/icons-src/battery_frame.svg
 
 STEPS_BLACK          := $(ICON_GEN_DIR)/steps_black.png
 STEPS_WHITE          := $(ICON_GEN_DIR)/steps_white.png
@@ -31,11 +32,14 @@ CAL_TOP_BLACK        := $(ICON_GEN_DIR)/calendar_top_black.png
 CAL_TOP_WHITE        := $(ICON_GEN_DIR)/calendar_top_white.png
 CAL_BOTTOM_BLACK     := $(ICON_GEN_DIR)/calendar_bottom_black.png
 CAL_BOTTOM_WHITE     := $(ICON_GEN_DIR)/calendar_bottom_white.png
+BATTERY_BLACK        := $(ICON_GEN_DIR)/battery_frame_black.png
+BATTERY_WHITE        := $(ICON_GEN_DIR)/battery_frame_white.png
 
 GENERATED_PNGS := \
 	$(STEPS_BLACK) $(STEPS_WHITE) \
 	$(CAL_TOP_BLACK) $(CAL_TOP_WHITE) \
-	$(CAL_BOTTOM_BLACK) $(CAL_BOTTOM_WHITE)
+	$(CAL_BOTTOM_BLACK) $(CAL_BOTTOM_WHITE) \
+	$(BATTERY_BLACK) $(BATTERY_WHITE)
 
 # $1 = svg, $2 = black png out, $3 = width, $4 = height
 define render_svg_black
@@ -147,7 +151,7 @@ check:
 
 # Generate white/black PNG variants from SVG sources (host-side).
 assets: $(GENERATED_PNGS)
-	@echo "OK: generated Steps and Calendar icon PNGs"
+	@echo "OK: generated Steps, Calendar, and Battery icon PNGs"
 
 $(ICON_GEN_DIR):
 	@mkdir -p "$(ICON_GEN_DIR)"
@@ -169,6 +173,12 @@ $(CAL_BOTTOM_BLACK): $(CALENDAR_BOTTOM_SVG) | $(ICON_GEN_DIR)
 
 $(CAL_BOTTOM_WHITE): $(CAL_BOTTOM_BLACK)
 	$(call negate_to_white,$(CAL_BOTTOM_BLACK),$(CAL_BOTTOM_WHITE),30,18)
+
+$(BATTERY_BLACK): $(BATTERY_FRAME_SVG) | $(ICON_GEN_DIR)
+	$(call render_svg_black,$(BATTERY_FRAME_SVG),$(BATTERY_BLACK),30,16)
+
+$(BATTERY_WHITE): $(BATTERY_BLACK)
+	$(call negate_to_white,$(BATTERY_BLACK),$(BATTERY_WHITE),30,16)
 
 build: check assets
 	@mkdir -p "$(BUILD_DIR)"

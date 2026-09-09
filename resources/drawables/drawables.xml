@@ -7,4 +7,6 @@
     <bitmap id="CalendarTopBlack" filename="generated/calendar_top_black.png" />
     <bitmap id="CalendarBottomWhite" filename="generated/calendar_bottom_white.png" />
     <bitmap id="CalendarBottomBlack" filename="generated/calendar_bottom_black.png" />
+    <bitmap id="BatteryFrameWhite" filename="generated/battery_frame_white.png" />
+    <bitmap id="BatteryFrameBlack" filename="generated/battery_frame_black.png" />
 </drawables>

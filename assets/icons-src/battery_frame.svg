@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="30" height="16" viewBox="0 0 30 16">
+  <!-- Provisional battery frame: body outline + terminal; transparent interior. -->
+  <path fill="#000000" fill-rule="evenodd"
+        d="M2 2h24v12H2zM4 4h20v8H4z"/>
+  <rect x="26" y="5" width="2" height="6" fill="#000000"/>
+</svg>

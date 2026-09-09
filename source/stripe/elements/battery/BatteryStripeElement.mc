@@ -1,17 +1,22 @@
 import Toybox.Graphics;
 import Toybox.Lang;
 import Toybox.System;
+import Toybox.WatchUi;
 
-// Battery stripe element: icon in top row, percentage text in bottom row.
+// Battery stripe element: SVG frame + dynamic fill in top row, % text in bottom.
 class BatteryStripeElement extends StripeElement {
 
     private var _percentage as Number;
     private var _percentageText as String;
+    private var _frameWhite as BitmapResource;
+    private var _frameBlack as BitmapResource;
 
     function initialize() {
         StripeElement.initialize();
         _percentage = 0;
         _percentageText = "0%";
+        _frameWhite = WatchUi.loadResource($.Rez.Drawables.BatteryFrameWhite) as BitmapResource;
+        _frameBlack = WatchUi.loadResource($.Rez.Drawables.BatteryFrameBlack) as BitmapResource;
     }
 
     function getRefreshIntervalSeconds() as Number {
@@ -45,53 +50,46 @@ class BatteryStripeElement extends StripeElement {
             return;
         }
 
-        var percentage = _percentage;
-        var rowX = rowBounds[0];
-        var rowY = rowBounds[1];
-        var rowWidth = rowBounds[2];
-        var rowHeight = rowBounds[3];
-
-        var totalWidth = BatteryStripeStyle.BODY_WIDTH + BatteryStripeStyle.TERMINAL_WIDTH;
-        var bodyX = StripeElementLayout.centeredContentX(rowX, rowWidth, totalWidth);
-        var bodyY = StripeElementLayout.anchoredContentY(
-            rowIndex,
-            rowY,
-            rowHeight,
-            BatteryStripeStyle.BODY_HEIGHT
-        );
-        var outline = BatteryStripeStyle.OUTLINE_THICKNESS;
-        var innerX = bodyX + outline;
-        var innerY = bodyY + outline;
-        var innerWidth = BatteryStripeStyle.BODY_WIDTH - (outline * 2);
-        var innerHeight = BatteryStripeStyle.BODY_HEIGHT - (outline * 2);
-        var fillWidth = (innerWidth * percentage) / 100;
-
-        dc.setColor(foregroundColor, foregroundColor);
-        dc.fillRectangle(
-            bodyX,
-            bodyY,
-            BatteryStripeStyle.BODY_WIDTH,
-            BatteryStripeStyle.BODY_HEIGHT
-        );
-
-        dc.setColor(backgroundColor, backgroundColor);
-        dc.fillRectangle(innerX, innerY, innerWidth, innerHeight);
-
-        if (fillWidth > 0) {
-            dc.setColor(foregroundColor, foregroundColor);
-            dc.fillRectangle(innerX, innerY, fillWidth, innerHeight);
+        var frame = _frameWhite;
+        if (foregroundColor == Graphics.COLOR_BLACK) {
+            frame = _frameBlack;
         }
 
-        var terminalX = bodyX + BatteryStripeStyle.BODY_WIDTH;
-        var terminalY = bodyY
-            + ((BatteryStripeStyle.BODY_HEIGHT - BatteryStripeStyle.TERMINAL_HEIGHT) / 2);
-        dc.setColor(foregroundColor, foregroundColor);
-        dc.fillRectangle(
-            terminalX,
-            terminalY,
-            BatteryStripeStyle.TERMINAL_WIDTH,
-            BatteryStripeStyle.TERMINAL_HEIGHT
+        var assetWidth = BatteryStripeStyle.ASSET_WIDTH;
+        var assetHeight = BatteryStripeStyle.ASSET_HEIGHT;
+        var frameX = StripeElementLayout.centeredContentX(
+            rowBounds[0],
+            rowBounds[2],
+            assetWidth
         );
+        var frameY = StripeElementLayout.anchoredContentY(
+            rowIndex,
+            rowBounds[1],
+            rowBounds[3],
+            assetHeight
+        );
+
+        var maxFillWidth = BatteryStripeStyle.INNER_FILL_MAX_WIDTH;
+        var fillWidth = (maxFillWidth * _percentage) / 100;
+        if (fillWidth < 0) {
+            fillWidth = 0;
+        }
+        if (fillWidth > maxFillWidth) {
+            fillWidth = maxFillWidth;
+        }
+
+        // Fill under the frame; unfilled area shows stripe through transparent interior.
+        if (fillWidth > 0) {
+            dc.setColor(foregroundColor, foregroundColor);
+            dc.fillRectangle(
+                frameX + BatteryStripeStyle.INNER_FILL_X,
+                frameY + BatteryStripeStyle.INNER_FILL_Y,
+                fillWidth,
+                BatteryStripeStyle.INNER_FILL_HEIGHT
+            );
+        }
+
+        dc.drawBitmap(frameX, frameY, frame);
     }
 
     function getRowText(rowIndex as Number) as String or Null {

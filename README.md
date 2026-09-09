@@ -86,6 +86,9 @@ bitmaps under `resources/drawables/generated/` (white and black variants).
   (`calendar_top.svg`, `calendar_bottom.svg`, 30×18); weekday/day text stays
   dynamic and is overlaid at runtime. Bitmap size is Calendar-local; rows stay
   derived from stripe geometry.
+- **Battery:** one SVG frame (`battery_frame.svg`, 30×16); Black/White variants
+  are generated. The percentage fill remains dynamic Monkey C drawing and must
+  stay aligned with Battery-local fill geometry if the SVG changes.
 - Run `make assets` after editing an SVG.
 - `make build` / `make run` generate assets automatically.
 - Keep shapes simple and readable at these sizes (no gradients/filters).
