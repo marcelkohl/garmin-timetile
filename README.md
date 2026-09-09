@@ -89,6 +89,11 @@ bitmaps under `resources/drawables/generated/` (white and black variants).
 - **Battery:** one SVG frame (`battery_frame.svg`, 30×16); Black/White variants
   are generated. The percentage fill remains dynamic Monkey C drawing and must
   stay aligned with Battery-local fill geometry if the SVG changes.
+- **Weather:** seven family SVGs under `assets/icons-src/weather/`
+  (`clear`, `partly_cloudy`, `cloudy`, `rain`, `thunderstorm`, `snow`,
+  `unknown`, each 18×18). Garmin conditions map to these visual families;
+  `unknown.svg` is the fallback. Each family produces Black and White PNG
+  variants. Replace an SVG and run `make assets` to update that icon.
 - Run `make assets` after editing an SVG.
 - `make build` / `make run` generate assets automatically.
 - Keep shapes simple and readable at these sizes (no gradients/filters).
@@ -106,7 +111,7 @@ Preferred longer-term converter: `rsvg-convert` from `librsvg2-bin`.
 ├── docs/
 │   └── ubuntu-24.04-setup.md
 ├── assets/
-│   └── icons-src/          (editable SVG sources)
+│   └── icons-src/          (editable SVG sources; weather/ families)
 ├── manifest.xml
 ├── monkey.jungle
 ├── resources/

@@ -26,6 +26,10 @@ CALENDAR_TOP_SVG     := assets/icons-src/calendar_top.svg
 CALENDAR_BOTTOM_SVG  := assets/icons-src/calendar_bottom.svg
 BATTERY_FRAME_SVG    := assets/icons-src/battery_frame.svg
 
+WEATHER_ICON_DIR     := assets/icons-src/weather
+WEATHER_SIZE         := 18
+WEATHER_FAMILIES     := clear partly_cloudy cloudy rain thunderstorm snow unknown
+
 STEPS_BLACK          := $(ICON_GEN_DIR)/steps_black.png
 STEPS_WHITE          := $(ICON_GEN_DIR)/steps_white.png
 CAL_TOP_BLACK        := $(ICON_GEN_DIR)/calendar_top_black.png
@@ -35,11 +39,15 @@ CAL_BOTTOM_WHITE     := $(ICON_GEN_DIR)/calendar_bottom_white.png
 BATTERY_BLACK        := $(ICON_GEN_DIR)/battery_frame_black.png
 BATTERY_WHITE        := $(ICON_GEN_DIR)/battery_frame_white.png
 
+WEATHER_BLACK_PNGS := $(foreach f,$(WEATHER_FAMILIES),$(ICON_GEN_DIR)/weather_$(f)_black.png)
+WEATHER_WHITE_PNGS := $(foreach f,$(WEATHER_FAMILIES),$(ICON_GEN_DIR)/weather_$(f)_white.png)
+
 GENERATED_PNGS := \
 	$(STEPS_BLACK) $(STEPS_WHITE) \
 	$(CAL_TOP_BLACK) $(CAL_TOP_WHITE) \
 	$(CAL_BOTTOM_BLACK) $(CAL_BOTTOM_WHITE) \
-	$(BATTERY_BLACK) $(BATTERY_WHITE)
+	$(BATTERY_BLACK) $(BATTERY_WHITE) \
+	$(WEATHER_BLACK_PNGS) $(WEATHER_WHITE_PNGS)
 
 # $1 = svg, $2 = black png out, $3 = width, $4 = height
 define render_svg_black
@@ -151,7 +159,7 @@ check:
 
 # Generate white/black PNG variants from SVG sources (host-side).
 assets: $(GENERATED_PNGS)
-	@echo "OK: generated Steps, Calendar, and Battery icon PNGs"
+	@echo "OK: generated Steps, Calendar, Battery, and Weather icon PNGs"
 
 $(ICON_GEN_DIR):
 	@mkdir -p "$(ICON_GEN_DIR)"
@@ -179,6 +187,17 @@ $(BATTERY_BLACK): $(BATTERY_FRAME_SVG) | $(ICON_GEN_DIR)
 
 $(BATTERY_WHITE): $(BATTERY_BLACK)
 	$(call negate_to_white,$(BATTERY_BLACK),$(BATTERY_WHITE),30,16)
+
+# Weather families: one SVG → black PNG → white PNG (18×18).
+define weather_icon_rules
+$(ICON_GEN_DIR)/weather_$(1)_black.png: $(WEATHER_ICON_DIR)/$(1).svg | $(ICON_GEN_DIR)
+	$$(call render_svg_black,$(WEATHER_ICON_DIR)/$(1).svg,$(ICON_GEN_DIR)/weather_$(1)_black.png,$(WEATHER_SIZE),$(WEATHER_SIZE))
+
+$(ICON_GEN_DIR)/weather_$(1)_white.png: $(ICON_GEN_DIR)/weather_$(1)_black.png
+	$$(call negate_to_white,$(ICON_GEN_DIR)/weather_$(1)_black.png,$(ICON_GEN_DIR)/weather_$(1)_white.png,$(WEATHER_SIZE),$(WEATHER_SIZE))
+endef
+
+$(foreach family,$(WEATHER_FAMILIES),$(eval $(call weather_icon_rules,$(family))))
 
 build: check assets
 	@mkdir -p "$(BUILD_DIR)"

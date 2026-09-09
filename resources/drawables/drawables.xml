@@ -9,4 +9,18 @@
     <bitmap id="CalendarBottomBlack" filename="generated/calendar_bottom_black.png" />
     <bitmap id="BatteryFrameWhite" filename="generated/battery_frame_white.png" />
     <bitmap id="BatteryFrameBlack" filename="generated/battery_frame_black.png" />
+    <bitmap id="WeatherClearWhite" filename="generated/weather_clear_white.png" />
+    <bitmap id="WeatherClearBlack" filename="generated/weather_clear_black.png" />
+    <bitmap id="WeatherPartlyCloudyWhite" filename="generated/weather_partly_cloudy_white.png" />
+    <bitmap id="WeatherPartlyCloudyBlack" filename="generated/weather_partly_cloudy_black.png" />
+    <bitmap id="WeatherCloudyWhite" filename="generated/weather_cloudy_white.png" />
+    <bitmap id="WeatherCloudyBlack" filename="generated/weather_cloudy_black.png" />
+    <bitmap id="WeatherRainWhite" filename="generated/weather_rain_white.png" />
+    <bitmap id="WeatherRainBlack" filename="generated/weather_rain_black.png" />
+    <bitmap id="WeatherThunderstormWhite" filename="generated/weather_thunderstorm_white.png" />
+    <bitmap id="WeatherThunderstormBlack" filename="generated/weather_thunderstorm_black.png" />
+    <bitmap id="WeatherSnowWhite" filename="generated/weather_snow_white.png" />
+    <bitmap id="WeatherSnowBlack" filename="generated/weather_snow_black.png" />
+    <bitmap id="WeatherUnknownWhite" filename="generated/weather_unknown_white.png" />
+    <bitmap id="WeatherUnknownBlack" filename="generated/weather_unknown_black.png" />
 </drawables>
