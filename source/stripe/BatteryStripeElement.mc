@@ -2,23 +2,32 @@ import Toybox.Graphics;
 import Toybox.Lang;
 import Toybox.System;
 
-// Top-slot battery icon and percentage for the vertical stripe.
+// Top-slot battery: icon in top row, percentage text in bottom row.
 class BatteryStripeElement extends StripeElement {
 
     function initialize() {
         StripeElement.initialize();
     }
 
-    function draw(
+    function drawRowIcon(
         dc as Dc,
-        centerX as Number,
-        centerY as Number,
+        rowIndex as Number,
+        rowBounds as Array<Number>,
         foregroundColor as Number
     ) as Void {
+        if (rowIndex != 0) {
+            return;
+        }
+
         var percentage = batteryPercentage();
+        var rowX = rowBounds[0];
+        var rowY = rowBounds[1];
+        var rowWidth = rowBounds[2];
+        var rowHeight = rowBounds[3];
+
         var totalWidth = TimeTileStyle.BATTERY_BODY_WIDTH + TimeTileStyle.BATTERY_TERMINAL_WIDTH;
-        var bodyX = centerX - (totalWidth / 2);
-        var bodyY = centerY - (TimeTileStyle.BATTERY_BODY_HEIGHT / 2);
+        var bodyX = rowX + ((rowWidth - totalWidth) / 2);
+        var bodyY = rowY + ((rowHeight - TimeTileStyle.BATTERY_BODY_HEIGHT) / 2);
         var outline = TimeTileStyle.BATTERY_OUTLINE_THICKNESS;
         var innerX = bodyX + outline;
         var innerY = bodyY + outline;
@@ -26,7 +35,6 @@ class BatteryStripeElement extends StripeElement {
         var innerHeight = TimeTileStyle.BATTERY_BODY_HEIGHT - (outline * 2);
         var fillWidth = (innerWidth * percentage) / 100;
 
-        // Foreground body, then restore stripe color inside to form the outline frame.
         dc.setColor(foregroundColor, foregroundColor);
         dc.fillRectangle(
             bodyX,
@@ -53,18 +61,13 @@ class BatteryStripeElement extends StripeElement {
             TimeTileStyle.BATTERY_TERMINAL_WIDTH,
             TimeTileStyle.BATTERY_TERMINAL_HEIGHT
         );
+    }
 
-        var labelY = bodyY
-            + TimeTileStyle.BATTERY_BODY_HEIGHT
-            + TimeTileStyle.BATTERY_TEXT_GAP;
-        dc.setColor(foregroundColor, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(
-            centerX,
-            labelY,
-            TimeTileStyle.BATTERY_TEXT_FONT,
-            percentage.format("%d") + "%",
-            Graphics.TEXT_JUSTIFY_CENTER
-        );
+    function getRowText(rowIndex as Number) as String or Null {
+        if (rowIndex != 1) {
+            return null;
+        }
+        return batteryPercentage().format("%d") + "%";
     }
 
     private function batteryPercentage() as Number {

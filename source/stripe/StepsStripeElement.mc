@@ -2,27 +2,41 @@ import Toybox.ActivityMonitor;
 import Toybox.Graphics;
 import Toybox.Lang;
 
-// Bottom-slot step counter with a provisional two-footprint icon.
+// Bottom-slot steps: footprints in top row, step count text in bottom row.
 class StepsStripeElement extends StripeElement {
 
     function initialize() {
         StripeElement.initialize();
     }
 
-    function draw(
+    function drawRowIcon(
+        dc as Dc,
+        rowIndex as Number,
+        rowBounds as Array<Number>,
+        foregroundColor as Number
+    ) as Void {
+        if (rowIndex != 0) {
+            return;
+        }
+
+        var centerX = rowBounds[0] + (rowBounds[2] / 2);
+        var centerY = rowBounds[1] + (rowBounds[3] / 2);
+        drawFootprints(dc, centerX, centerY, foregroundColor);
+    }
+
+    function getRowText(rowIndex as Number) as String or Null {
+        if (rowIndex != 1) {
+            return null;
+        }
+        return formatSteps(stepsCount());
+    }
+
+    private function drawFootprints(
         dc as Dc,
         centerX as Number,
         centerY as Number,
         foregroundColor as Number
     ) as Void {
-        var steps = stepsCount();
-        var stepsText = formatSteps(steps);
-
-        drawFootprints(dc, centerX, centerY, foregroundColor);
-        drawStepsValue(dc, centerX, centerY, stepsText, foregroundColor);
-    }
-
-    private function drawFootprints(dc as Dc, centerX as Number, centerY as Number, foregroundColor as Number) as Void {
         var leftCenterX = centerX - TimeTileStyle.STEPS_FOOTPRINT_CENTER_OFFSET_X;
         var rightCenterX = centerX + TimeTileStyle.STEPS_FOOTPRINT_CENTER_OFFSET_X;
 
@@ -68,24 +82,6 @@ class StepsStripeElement extends StripeElement {
         dc.fillPolygon(rightPoints);
     }
 
-    private function drawStepsValue(
-        dc as Dc,
-        centerX as Number,
-        centerY as Number,
-        stepsText as String,
-        foregroundColor as Number
-    ) as Void {
-        var valueY = centerY + TimeTileStyle.STEPS_TEXT_OFFSET_Y;
-        dc.setColor(foregroundColor, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(
-            centerX,
-            valueY,
-            TimeTileStyle.STEPS_TEXT_FONT,
-            stepsText,
-            Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER
-        );
-    }
-
     private function stepsCount() as Number {
         var info = ActivityMonitor.getInfo();
         var steps = info.steps;
@@ -112,4 +108,3 @@ class StepsStripeElement extends StripeElement {
         return stepsNum.format("%d");
     }
 }
-

@@ -48,28 +48,26 @@ module TimeTileStyle {
     // Default stripe element foreground (later: user setting white/black only).
     const STRIPE_FOREGROUND_COLOR = Graphics.COLOR_WHITE;
 
-    // Battery icon geometry (geometric primitives).
+    // Shared two-row stripe element layout.
+    // ELEMENT_HEIGHT must equal ROW_HEIGHT * 2.
+    const STRIPE_ELEMENT_WIDTH = 40;
+    const STRIPE_ROW_HEIGHT = 16;
+    const STRIPE_ELEMENT_HEIGHT = STRIPE_ROW_HEIGHT * 2;
+    const STRIPE_ROW_PADDING = 2;
+    const STRIPE_ROW_ICON_INSET = 2;
+    const STRIPE_ROW_FONT = Graphics.FONT_XTINY;
+
+    // Battery icon geometry (top-row geometric primitives).
     const BATTERY_BODY_WIDTH = 24;
     const BATTERY_BODY_HEIGHT = 12;
     const BATTERY_OUTLINE_THICKNESS = 2;
     const BATTERY_TERMINAL_WIDTH = 3;
     const BATTERY_TERMINAL_HEIGHT = 6;
-    const BATTERY_TEXT_FONT = Graphics.FONT_XTINY;
-    const BATTERY_TEXT_GAP = 4;
 
-    // Calendar icon geometry (geometric primitives).
-    const CALENDAR_WIDTH = 30;
-    const CALENDAR_HEIGHT = 30;
-    const CALENDAR_HEADER_HEIGHT = 11;
+    // Calendar shape geometry within each row.
     const CALENDAR_OUTLINE_THICKNESS = 2;
-    const CALENDAR_WEEKDAY_FONT = Graphics.FONT_XTINY;
-    const CALENDAR_DATE_FONT = Graphics.FONT_XTINY;
 
-    // Steps icon geometry (provisional).
-    const STEPS_TEXT_FONT = Graphics.FONT_XTINY;
-    const STEPS_TEXT_OFFSET_Y = 14;
-
-    // Two footprints as simple filled slanted parallelograms.
+    // Steps footprint geometry (provisional, top row).
     const STEPS_FOOTPRINT_WIDTH = 12;
     const STEPS_FOOTPRINT_HEIGHT = 8;
     const STEPS_FOOTPRINT_SLANT = 2;
