@@ -2,17 +2,26 @@ import Toybox.Graphics;
 import Toybox.Lang;
 import Toybox.Time;
 import Toybox.Time.Gregorian;
+import Toybox.WatchUi;
 
-// Calendar stripe element: filled weekday row + outlined day row.
+// Calendar stripe element: SVG-backed row images with overlaid cached text.
 class CalendarStripeElement extends StripeElement {
 
     private var _weekdayText as String;
     private var _dayText as String;
+    private var _topWhite as BitmapResource;
+    private var _topBlack as BitmapResource;
+    private var _bottomWhite as BitmapResource;
+    private var _bottomBlack as BitmapResource;
 
     function initialize() {
         StripeElement.initialize();
         _weekdayText = "";
         _dayText = "";
+        _topWhite = WatchUi.loadResource($.Rez.Drawables.CalendarTopWhite) as BitmapResource;
+        _topBlack = WatchUi.loadResource($.Rez.Drawables.CalendarTopBlack) as BitmapResource;
+        _bottomWhite = WatchUi.loadResource($.Rez.Drawables.CalendarBottomWhite) as BitmapResource;
+        _bottomBlack = WatchUi.loadResource($.Rez.Drawables.CalendarBottomBlack) as BitmapResource;
     }
 
     function getRefreshIntervalSeconds() as Number {
@@ -37,60 +46,58 @@ class CalendarStripeElement extends StripeElement {
         foregroundColor as Number,
         backgroundColor as Number
     ) as Void {
-        var inset = StripeElementLayout.ROW_ICON_INSET;
-        var outline = CalendarStripeStyle.OUTLINE_THICKNESS;
-        var x = rowBounds[0] + inset;
-        var y = rowBounds[1] + StripeElementLayout.ROW_PADDING;
-        var width = rowBounds[2] - (inset * 2);
-        var height = rowBounds[3] - (StripeElementLayout.ROW_PADDING * 2);
-
-        if (width <= 0 || height <= 0) {
-            return;
-        }
-
-        if (rowIndex == StripeElementLayout.ROW_TOP) {
-            // Filled header; weekday uses stripe background for contrast on foreground fill.
-            dc.setColor(foregroundColor, foregroundColor);
-            dc.fillRectangle(x, y, width, height);
-
-            dc.setColor(backgroundColor, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(
-                rowBounds[0] + (rowBounds[2] / 2),
-                rowBounds[1] + (rowBounds[3] / 2),
-                CalendarStripeStyle.WEEKDAY_FONT,
-                _weekdayText,
-                Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER
-            );
-            return;
-        }
-
-        if (rowIndex == StripeElementLayout.ROW_BOTTOM) {
-            dc.setColor(foregroundColor, foregroundColor);
-            dc.fillRectangle(x, y, width, height);
-            dc.setColor(backgroundColor, backgroundColor);
-            if ((width > outline * 2) && (height > outline * 2)) {
-                dc.fillRectangle(
-                    x + outline,
-                    y + outline,
-                    width - (outline * 2),
-                    height - (outline * 2)
-                );
-            }
-        }
+        var icon = selectRowIcon(rowIndex, foregroundColor);
+        var iconWidth = icon.getWidth();
+        var iconHeight = icon.getHeight();
+        var x = rowBounds[0] + ((rowBounds[2] - iconWidth) / 2);
+        var y = rowBounds[1] + ((rowBounds[3] - iconHeight) / 2);
+        dc.drawBitmap(x, y, icon);
     }
 
     function getRowText(rowIndex as Number) as String or Null {
-        if (rowIndex != StripeElementLayout.ROW_BOTTOM) {
-            return null;
+        if (rowIndex == StripeElementLayout.ROW_TOP) {
+            return _weekdayText;
         }
-        return _dayText;
+        if (rowIndex == StripeElementLayout.ROW_BOTTOM) {
+            return _dayText;
+        }
+        return null;
+    }
+
+    function getRowTextColor(
+        rowIndex as Number,
+        foregroundColor as Number,
+        backgroundColor as Number
+    ) as Number {
+        if (rowIndex == StripeElementLayout.ROW_TOP) {
+            // Contrast against the filled header bitmap.
+            return backgroundColor;
+        }
+        return foregroundColor;
     }
 
     function getRowFont(rowIndex as Number) as FontDefinition {
+        if (rowIndex == StripeElementLayout.ROW_TOP) {
+            return CalendarStripeStyle.WEEKDAY_FONT;
+        }
         if (rowIndex == StripeElementLayout.ROW_BOTTOM) {
             return CalendarStripeStyle.DAY_FONT;
         }
         return StripeElementLayout.DEFAULT_ROW_FONT;
+    }
+
+    private function selectRowIcon(rowIndex as Number, foregroundColor as Number) as BitmapResource {
+        var useBlack = (foregroundColor == Graphics.COLOR_BLACK);
+        if (rowIndex == StripeElementLayout.ROW_TOP) {
+            if (useBlack) {
+                return _topBlack;
+            }
+            return _topWhite;
+        }
+        if (useBlack) {
+            return _bottomBlack;
+        }
+        return _bottomWhite;
     }
 
     private function weekdayAbbrev(dayOfWeek as Number or String) as String {

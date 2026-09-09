@@ -18,12 +18,46 @@ SETTINGS_DEST  := GARMIN/Settings/$(APP_NAME)_$(DEVICE)-settings.json
 JUNGLE         := monkey.jungle
 
 # SVG → PNG icon pipeline (host ImageMagick; generated PNGs are not committed).
-ICON_SRC       := assets/icons-src/steps.svg
 ICON_GEN_DIR   := resources/drawables/generated
-ICON_BLACK     := $(ICON_GEN_DIR)/steps_black.png
-ICON_WHITE     := $(ICON_GEN_DIR)/steps_white.png
-ICON_SIZE      := 16
 CONVERT        := $(shell command -v convert 2>/dev/null)
+
+STEPS_SVG            := assets/icons-src/steps.svg
+CALENDAR_TOP_SVG     := assets/icons-src/calendar_top.svg
+CALENDAR_BOTTOM_SVG  := assets/icons-src/calendar_bottom.svg
+
+STEPS_BLACK          := $(ICON_GEN_DIR)/steps_black.png
+STEPS_WHITE          := $(ICON_GEN_DIR)/steps_white.png
+CAL_TOP_BLACK        := $(ICON_GEN_DIR)/calendar_top_black.png
+CAL_TOP_WHITE        := $(ICON_GEN_DIR)/calendar_top_white.png
+CAL_BOTTOM_BLACK     := $(ICON_GEN_DIR)/calendar_bottom_black.png
+CAL_BOTTOM_WHITE     := $(ICON_GEN_DIR)/calendar_bottom_white.png
+
+GENERATED_PNGS := \
+	$(STEPS_BLACK) $(STEPS_WHITE) \
+	$(CAL_TOP_BLACK) $(CAL_TOP_WHITE) \
+	$(CAL_BOTTOM_BLACK) $(CAL_BOTTOM_WHITE)
+
+# $1 = svg, $2 = black png out, $3 = width, $4 = height
+define render_svg_black
+	@if [ -z "$(CONVERT)" ]; then \
+		echo "ERROR: ImageMagick 'convert' not found on PATH."; \
+		echo "Install on Ubuntu: sudo apt install imagemagick"; \
+		echo "Preferred alternative: sudo apt install librsvg2-bin  (rsvg-convert)"; \
+		exit 1; \
+	fi
+	@echo "Generating $(2) ($(3)x$(4)) from $(1)..."
+	@"$(CONVERT)" -background none -size $(3)x$(4) "$(1)" PNG32:"$(2)"
+	@identify -format '%wx%h' "$(2)" | grep -qx '$(3)x$(4)' \
+		|| (echo "ERROR: $(2) is not $(3)x$(4)"; exit 1)
+endef
+
+# $1 = black png, $2 = white png out, $3 = width, $4 = height
+define negate_to_white
+	@echo "Generating $(2) from $(1)..."
+	@"$(CONVERT)" "$(1)" -channel RGB -negate +channel PNG32:"$(2)"
+	@identify -format '%wx%h' "$(2)" | grep -qx '$(3)x$(4)' \
+		|| (echo "ERROR: $(2) is not $(3)x$(4)"; exit 1)
+endef
 
 # Resolve active SDK path from current-sdk.cfg (supports SDK root or .../bin).
 SDK_PATH_RAW := $(shell tr -d '\r\n' < "$(SDK_CFG)" 2>/dev/null | sed 's:/*$$::')
@@ -111,30 +145,30 @@ check:
 	fi; \
 	exit $$status
 
-# Generate white/black PNG variants from the single Steps SVG (host-side).
-assets: $(ICON_WHITE) $(ICON_BLACK)
-	@echo "OK: generated $(ICON_BLACK) and $(ICON_WHITE)"
+# Generate white/black PNG variants from SVG sources (host-side).
+assets: $(GENERATED_PNGS)
+	@echo "OK: generated Steps and Calendar icon PNGs"
 
 $(ICON_GEN_DIR):
 	@mkdir -p "$(ICON_GEN_DIR)"
 
-$(ICON_BLACK): $(ICON_SRC) | $(ICON_GEN_DIR)
-	@if [ -z "$(CONVERT)" ]; then \
-		echo "ERROR: ImageMagick 'convert' not found on PATH."; \
-		echo "Install on Ubuntu: sudo apt install imagemagick"; \
-		echo "Preferred alternative: sudo apt install librsvg2-bin  (rsvg-convert)"; \
-		exit 1; \
-	fi
-	@echo "Generating $(ICON_BLACK) ($(ICON_SIZE)x$(ICON_SIZE)) from $(ICON_SRC)..."
-	@"$(CONVERT)" -background none -size $(ICON_SIZE)x$(ICON_SIZE) "$(ICON_SRC)" PNG32:"$(ICON_BLACK)"
-	@identify -format '%wx%h' "$(ICON_BLACK)" | grep -qx '$(ICON_SIZE)x$(ICON_SIZE)' \
-		|| (echo "ERROR: $(ICON_BLACK) is not $(ICON_SIZE)x$(ICON_SIZE)"; exit 1)
+$(STEPS_BLACK): $(STEPS_SVG) | $(ICON_GEN_DIR)
+	$(call render_svg_black,$(STEPS_SVG),$(STEPS_BLACK),16,16)
 
-$(ICON_WHITE): $(ICON_BLACK)
-	@echo "Generating $(ICON_WHITE) from $(ICON_BLACK)..."
-	@"$(CONVERT)" "$(ICON_BLACK)" -channel RGB -negate +channel PNG32:"$(ICON_WHITE)"
-	@identify -format '%wx%h' "$(ICON_WHITE)" | grep -qx '$(ICON_SIZE)x$(ICON_SIZE)' \
-		|| (echo "ERROR: $(ICON_WHITE) is not $(ICON_SIZE)x$(ICON_SIZE)"; exit 1)
+$(STEPS_WHITE): $(STEPS_BLACK)
+	$(call negate_to_white,$(STEPS_BLACK),$(STEPS_WHITE),16,16)
+
+$(CAL_TOP_BLACK): $(CALENDAR_TOP_SVG) | $(ICON_GEN_DIR)
+	$(call render_svg_black,$(CALENDAR_TOP_SVG),$(CAL_TOP_BLACK),30,16)
+
+$(CAL_TOP_WHITE): $(CAL_TOP_BLACK)
+	$(call negate_to_white,$(CAL_TOP_BLACK),$(CAL_TOP_WHITE),30,16)
+
+$(CAL_BOTTOM_BLACK): $(CALENDAR_BOTTOM_SVG) | $(ICON_GEN_DIR)
+	$(call render_svg_black,$(CALENDAR_BOTTOM_SVG),$(CAL_BOTTOM_BLACK),30,16)
+
+$(CAL_BOTTOM_WHITE): $(CAL_BOTTOM_BLACK)
+	$(call negate_to_white,$(CAL_BOTTOM_BLACK),$(CAL_BOTTOM_WHITE),30,16)
 
 build: check assets
 	@mkdir -p "$(BUILD_DIR)"
@@ -152,7 +186,7 @@ build: check assets
 
 clean:
 	@rm -rf "$(BUILD_DIR)"
-	@rm -f "$(ICON_BLACK)" "$(ICON_WHITE)"
+	@rm -f $(GENERATED_PNGS)
 	@echo "OK: removed $(BUILD_DIR)/ and generated icon PNGs"
 
 simulator:

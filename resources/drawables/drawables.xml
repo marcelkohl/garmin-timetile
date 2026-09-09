@@ -3,4 +3,8 @@
     <bitmap id="LauncherIcon" filename="launcher_icon.png" />
     <bitmap id="StepsIconWhite" filename="generated/steps_white.png" />
     <bitmap id="StepsIconBlack" filename="generated/steps_black.png" />
+    <bitmap id="CalendarTopWhite" filename="generated/calendar_top_white.png" />
+    <bitmap id="CalendarTopBlack" filename="generated/calendar_top_black.png" />
+    <bitmap id="CalendarBottomWhite" filename="generated/calendar_bottom_white.png" />
+    <bitmap id="CalendarBottomBlack" filename="generated/calendar_bottom_black.png" />
 </drawables>

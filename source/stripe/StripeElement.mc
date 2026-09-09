@@ -95,9 +95,10 @@ class StripeElement {
         var text = getRowText(rowIndex);
         if ((text != null) && (text.length() > 0)) {
             var font = getRowFont(rowIndex);
+            var textColor = getRowTextColor(rowIndex, foregroundColor, backgroundColor);
             var textX = x + (width / 2);
             var textY = y + (height / 2);
-            dc.setColor(foregroundColor, Graphics.COLOR_TRANSPARENT);
+            dc.setColor(textColor, Graphics.COLOR_TRANSPARENT);
             dc.drawText(
                 textX,
                 textY,
@@ -124,6 +125,15 @@ class StripeElement {
     // Override to supply optional text layered over the same row.
     function getRowText(rowIndex as Number) as String or Null {
         return null;
+    }
+
+    // Override to choose row text color; default is the stripe foreground.
+    function getRowTextColor(
+        rowIndex as Number,
+        foregroundColor as Number,
+        backgroundColor as Number
+    ) as Number {
+        return foregroundColor;
     }
 
     // Override to choose a row-specific font; default is the shared row font.
