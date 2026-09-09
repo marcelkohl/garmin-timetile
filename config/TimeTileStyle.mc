@@ -34,8 +34,8 @@ module TimeTileStyle {
 
     // Plain vertical stripe rectangle.
     const STRIPE_COLOR = Graphics.COLOR_BLUE;
-    const STRIPE_LEFT_X = 150;
+    const STRIPE_LEFT_X = 145;
     const STRIPE_TOP_Y = 0;
-    const STRIPE_WIDTH = 50;
+    const STRIPE_WIDTH = 55;
     const STRIPE_HEIGHT = 250;
 }
