@@ -2,15 +2,56 @@ import Toybox.Graphics;
 import Toybox.Lang;
 
 // Common contract for interchangeable stripe content elements.
-// Owns the shared two-row layout: each row is one bounded area where an
-// optional icon/background and optional text are layered together.
+// Owns the shared two-row layout and generic refresh scheduling state.
+// Element-specific intervals and data fetches live in subclasses.
 class StripeElement {
 
+    // null means this instance has never been refreshed.
+    private var _lastRefreshSeconds as Number or Null;
+
     function initialize() {
+        _lastRefreshSeconds = null;
+    }
+
+    // Refresh cached data when due. Returns true if cached data changed.
+    function refreshIfDue(nowSeconds as Number) as Boolean {
+        if (!isRefreshDue(nowSeconds)) {
+            return false;
+        }
+
+        var changed = refreshData();
+        _lastRefreshSeconds = nowSeconds;
+        return changed;
+    }
+
+    // Fetch and cache element data. Override in subclasses that acquire data.
+    // Returns true when cached values changed.
+    function refreshData() as Boolean {
+        return false;
+    }
+
+    // Seconds between data refreshes. Override per element; base is unused.
+    function getRefreshIntervalSeconds() as Number {
+        return 0;
+    }
+
+    private function isRefreshDue(nowSeconds as Number) as Boolean {
+        if (_lastRefreshSeconds == null) {
+            return true;
+        }
+
+        var elapsed = nowSeconds - (_lastRefreshSeconds as Number);
+        // Clock rollback / rollover: treat as due.
+        if (elapsed < 0) {
+            return true;
+        }
+
+        return elapsed >= getRefreshIntervalSeconds();
     }
 
     // Draw this element centered at (centerX, centerY).
     // foregroundColor: icon/text color; backgroundColor: stripe fill for contrast.
+    // Drawing must use cached data only — never call Garmin data APIs here.
     function draw(
         dc as Dc,
         centerX as Number,

@@ -1,6 +1,7 @@
 import Toybox.Graphics;
 import Toybox.Lang;
 import Toybox.System;
+import Toybox.Time;
 import Toybox.WatchUi;
 
 class TimeTileView extends WatchUi.WatchFace {
@@ -19,6 +20,9 @@ class TimeTileView extends WatchUi.WatchFace {
     }
 
     function onUpdate(dc as Dc) as Void {
+        var nowSeconds = Time.now().value();
+        _stripePanel.refreshElementsIfDue(nowSeconds);
+
         dc.setColor(TimeTileStyle.BACKGROUND_COLOR, TimeTileStyle.BACKGROUND_COLOR);
         dc.clear();
 

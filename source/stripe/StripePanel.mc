@@ -42,6 +42,18 @@ class StripePanel {
         ] as Array<StripeElement>;
     }
 
+    // Ask each existing element to refresh if due. Does not recreate elements.
+    // Returns true if at least one element's cached data changed.
+    function refreshElementsIfDue(nowSeconds as Number) as Boolean {
+        var anyChanged = false;
+        for (var i = 0; i < _elements.size(); i += 1) {
+            if ((_elements[i] as StripeElement).refreshIfDue(nowSeconds)) {
+                anyChanged = true;
+            }
+        }
+        return anyChanged;
+    }
+
     function draw(dc as Dc) as Void {
         dc.setColor(_stripeColor, _stripeColor);
         dc.fillRectangle(

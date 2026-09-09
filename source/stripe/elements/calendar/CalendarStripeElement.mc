@@ -6,8 +6,28 @@ import Toybox.Time.Gregorian;
 // Calendar stripe element: filled weekday row + outlined day row.
 class CalendarStripeElement extends StripeElement {
 
+    private var _weekdayText as String;
+    private var _dayText as String;
+
     function initialize() {
         StripeElement.initialize();
+        _weekdayText = "";
+        _dayText = "";
+    }
+
+    function getRefreshIntervalSeconds() as Number {
+        return CalendarStripeStyle.REFRESH_INTERVAL_SECONDS;
+    }
+
+    function refreshData() as Boolean {
+        var info = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
+        var weekdayText = weekdayAbbrev(info.day_of_week);
+        var dayText = info.day.format("%d");
+
+        var changed = (!_weekdayText.equals(weekdayText)) || (!_dayText.equals(dayText));
+        _weekdayText = weekdayText;
+        _dayText = dayText;
+        return changed;
     }
 
     function drawRowIcon(
@@ -33,13 +53,12 @@ class CalendarStripeElement extends StripeElement {
             dc.setColor(foregroundColor, foregroundColor);
             dc.fillRectangle(x, y, width, height);
 
-            var info = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
             dc.setColor(backgroundColor, Graphics.COLOR_TRANSPARENT);
             dc.drawText(
                 rowBounds[0] + (rowBounds[2] / 2),
                 rowBounds[1] + (rowBounds[3] / 2),
                 CalendarStripeStyle.WEEKDAY_FONT,
-                weekdayAbbrev(info.day_of_week),
+                _weekdayText,
                 Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER
             );
             return;
@@ -64,8 +83,7 @@ class CalendarStripeElement extends StripeElement {
         if (rowIndex != StripeElementLayout.ROW_BOTTOM) {
             return null;
         }
-        var info = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
-        return info.day.format("%d");
+        return _dayText;
     }
 
     function getRowFont(rowIndex as Number) as FontDefinition {

@@ -5,8 +5,33 @@ import Toybox.System;
 // Battery stripe element: icon in top row, percentage text in bottom row.
 class BatteryStripeElement extends StripeElement {
 
+    private var _percentage as Number;
+    private var _percentageText as String;
+
     function initialize() {
         StripeElement.initialize();
+        _percentage = 0;
+        _percentageText = "0%";
+    }
+
+    function getRefreshIntervalSeconds() as Number {
+        return BatteryStripeStyle.REFRESH_INTERVAL_SECONDS;
+    }
+
+    function refreshData() as Boolean {
+        var percentage = System.getSystemStats().battery.toNumber();
+        if (percentage < 0) {
+            percentage = 0;
+        }
+        if (percentage > 100) {
+            percentage = 100;
+        }
+
+        var percentageText = percentage.format("%d") + "%";
+        var changed = (_percentage != percentage) || (!_percentageText.equals(percentageText));
+        _percentage = percentage;
+        _percentageText = percentageText;
+        return changed;
     }
 
     function drawRowIcon(
@@ -20,7 +45,7 @@ class BatteryStripeElement extends StripeElement {
             return;
         }
 
-        var percentage = batteryPercentage();
+        var percentage = _percentage;
         var rowX = rowBounds[0];
         var rowY = rowBounds[1];
         var rowWidth = rowBounds[2];
@@ -68,17 +93,6 @@ class BatteryStripeElement extends StripeElement {
         if (rowIndex != StripeElementLayout.ROW_BOTTOM) {
             return null;
         }
-        return batteryPercentage().format("%d") + "%";
-    }
-
-    private function batteryPercentage() as Number {
-        var percentage = System.getSystemStats().battery.toNumber();
-        if (percentage < 0) {
-            return 0;
-        }
-        if (percentage > 100) {
-            return 100;
-        }
-        return percentage;
+        return _percentageText;
     }
 }

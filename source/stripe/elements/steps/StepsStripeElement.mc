@@ -5,8 +5,38 @@ import Toybox.Lang;
 // Steps stripe element: footprints in top row, step count in bottom row.
 class StepsStripeElement extends StripeElement {
 
+    private var _steps as Number;
+    private var _stepsText as String;
+
     function initialize() {
         StripeElement.initialize();
+        _steps = 0;
+        _stepsText = "0";
+    }
+
+    function getRefreshIntervalSeconds() as Number {
+        return StepsStripeStyle.REFRESH_INTERVAL_SECONDS;
+    }
+
+    function refreshData() as Boolean {
+        var info = ActivityMonitor.getInfo();
+        var steps = info.steps;
+        var stepsNum = 0;
+        if (steps != null) {
+            stepsNum = steps as Number;
+        }
+        if (stepsNum < 0) {
+            stepsNum = 0;
+        }
+        if (stepsNum > 999999) {
+            stepsNum = 999999;
+        }
+
+        var stepsText = formatSteps(stepsNum);
+        var changed = (_steps != stepsNum) || (!_stepsText.equals(stepsText));
+        _steps = stepsNum;
+        _stepsText = stepsText;
+        return changed;
     }
 
     function drawRowIcon(
@@ -29,7 +59,7 @@ class StepsStripeElement extends StripeElement {
         if (rowIndex != StripeElementLayout.ROW_BOTTOM) {
             return null;
         }
-        return formatSteps(stepsCount());
+        return _stepsText;
     }
 
     private function drawFootprints(
@@ -79,23 +109,6 @@ class StepsStripeElement extends StripeElement {
         dc.setColor(foregroundColor, foregroundColor);
         dc.fillPolygon(leftPoints);
         dc.fillPolygon(rightPoints);
-    }
-
-    private function stepsCount() as Number {
-        var info = ActivityMonitor.getInfo();
-        var steps = info.steps;
-        if (steps == null) {
-            return 0;
-        }
-
-        var stepsNum = steps as Number;
-        if (stepsNum < 0) {
-            return 0;
-        }
-        if (stepsNum > 999999) {
-            return 999999;
-        }
-        return stepsNum;
     }
 
     private function formatSteps(stepsNum as Number) as String {
