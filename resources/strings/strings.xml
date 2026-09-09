@@ -10,6 +10,7 @@
     <string id="ElementBattery">Battery</string>
     <string id="ElementCalendar">Calendar</string>
     <string id="ElementSteps">Steps</string>
+    <string id="ElementWeather">Weather</string>
 
     <string id="StripeColorTitle">Stripe color</string>
     <string id="ElementColorTitle">Element color</string>

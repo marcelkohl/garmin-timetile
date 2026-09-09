@@ -7,6 +7,7 @@
             <listEntry value="1">@Strings.ElementBattery</listEntry>
             <listEntry value="2">@Strings.ElementCalendar</listEntry>
             <listEntry value="3">@Strings.ElementSteps</listEntry>
+            <listEntry value="4">@Strings.ElementWeather</listEntry>
         </settingConfig>
     </setting>
 
@@ -16,6 +17,7 @@
             <listEntry value="1">@Strings.ElementBattery</listEntry>
             <listEntry value="2">@Strings.ElementCalendar</listEntry>
             <listEntry value="3">@Strings.ElementSteps</listEntry>
+            <listEntry value="4">@Strings.ElementWeather</listEntry>
         </settingConfig>
     </setting>
 
@@ -25,6 +27,7 @@
             <listEntry value="1">@Strings.ElementBattery</listEntry>
             <listEntry value="2">@Strings.ElementCalendar</listEntry>
             <listEntry value="3">@Strings.ElementSteps</listEntry>
+            <listEntry value="4">@Strings.ElementWeather</listEntry>
         </settingConfig>
     </setting>
 

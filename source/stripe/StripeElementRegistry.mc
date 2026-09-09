@@ -8,9 +8,10 @@ module StripeElementRegistry {
     const BATTERY = 1;
     const CALENDAR = 2;
     const STEPS = 3;
+    const WEATHER = 4;
 
     function availableIds() as Array<Number> {
-        return [NONE, BATTERY, CALENDAR, STEPS] as Array<Number>;
+        return [NONE, BATTERY, CALENDAR, STEPS, WEATHER] as Array<Number>;
     }
 
     function isValid(id as Number) as Boolean {
@@ -32,6 +33,9 @@ module StripeElementRegistry {
         }
         if (id == STEPS) {
             return new StepsStripeElement();
+        }
+        if (id == WEATHER) {
+            return new WeatherStripeElement();
         }
 
         return new EmptyStripeElement();
