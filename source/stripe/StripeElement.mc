@@ -2,7 +2,7 @@ import Toybox.Graphics;
 import Toybox.Lang;
 
 // Common contract for interchangeable stripe content elements.
-// Owns the shared two-row layout and generic refresh scheduling state.
+// Owns the shared two-row square-block layout and generic refresh scheduling.
 // Element-specific intervals and data fetches live in subclasses.
 class StripeElement {
 
@@ -49,7 +49,7 @@ class StripeElement {
         return elapsed >= getRefreshIntervalSeconds();
     }
 
-    // Draw this element centered at (centerX, centerY).
+    // Draw this square element block centered at (centerX, centerY).
     // foregroundColor: icon/text color; backgroundColor: stripe fill for contrast.
     // Drawing must use cached data only — never call Garmin data APIs here.
     function draw(
@@ -59,18 +59,19 @@ class StripeElement {
         foregroundColor as Number,
         backgroundColor as Number
     ) as Void {
-        var width = StripeElementLayout.ELEMENT_WIDTH;
-        var rowHeight = StripeElementLayout.ROW_HEIGHT;
-        var elementX = centerX - (width / 2);
-        var elementY = centerY - (StripeElementLayout.ELEMENT_HEIGHT / 2);
+        var stripeWidth = TimeTileStyle.STRIPE_WIDTH;
+        var size = StripeElementLayout.elementSize(stripeWidth);
+        var rowHeight = StripeElementLayout.rowHeight(stripeWidth);
+        var blockX = centerX - (size / 2);
+        var blockY = centerY - (size / 2);
 
-        var topBounds = [elementX, elementY, width, rowHeight] as Array<Number>;
+        var topBounds = [blockX, blockY, size, rowHeight] as Array<Number>;
         drawBoundedRow(dc, StripeElementLayout.ROW_TOP, topBounds, foregroundColor, backgroundColor);
 
         var bottomBounds = [
-            elementX,
-            elementY + rowHeight,
-            width,
+            blockX,
+            blockY + rowHeight,
+            size,
             rowHeight
         ] as Array<Number>;
         drawBoundedRow(dc, StripeElementLayout.ROW_BOTTOM, bottomBounds, foregroundColor, backgroundColor);
@@ -96,15 +97,18 @@ class StripeElement {
         if ((text != null) && (text.length() > 0)) {
             var font = getRowFont(rowIndex);
             var textColor = getRowTextColor(rowIndex, foregroundColor, backgroundColor);
+            var dims = dc.getTextDimensions(text, font);
+            var textHeight = dims[1];
             var textX = x + (width / 2);
-            var textY = y + (height / 2);
+            // Top row: visual bottom on row bottom. Bottom row: visual top on row top.
+            var textY = StripeElementLayout.anchoredContentY(rowIndex, y, height, textHeight);
             dc.setColor(textColor, Graphics.COLOR_TRANSPARENT);
             dc.drawText(
                 textX,
                 textY,
                 font,
                 text,
-                Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER
+                Graphics.TEXT_JUSTIFY_CENTER
             );
         }
 

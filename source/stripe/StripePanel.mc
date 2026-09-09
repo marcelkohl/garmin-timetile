@@ -1,24 +1,23 @@
 import Toybox.Graphics;
 import Toybox.Lang;
 
-// Draws the stripe background and its three interchangeable content slots.
+// Draws the stripe background and its three interchangeable square content blocks.
 class StripePanel {
 
     private var _elements as Array<StripeElement>;
     private var _centerX as Number;
-    private var _slotCenterYs as Array<Number>;
+    private var _blockCenterYs as Array<Number>;
     private var _stripeColor as Number;
     private var _foregroundColor as Number;
 
     function initialize(elementIds as Array<Number>) {
-        _centerX = TimeTileStyle.STRIPE_CONTENT_CENTER_X;
+        _centerX = StripeElementLayout.stripeCenterX(
+            TimeTileStyle.STRIPE_LEFT_X,
+            TimeTileStyle.STRIPE_WIDTH
+        );
         _stripeColor = StripeAppearanceConfiguration.stripeColor();
         _foregroundColor = StripeAppearanceConfiguration.stripeForegroundColor();
-        _slotCenterYs = [
-            TimeTileStyle.TOP_SLOT_CENTER_Y,
-            TimeTileStyle.MIDDLE_SLOT_CENTER_Y,
-            TimeTileStyle.BOTTOM_SLOT_CENTER_Y
-        ] as Array<Number>;
+        _blockCenterYs = buildBlockCenterYs();
 
         var topId = StripeElementRegistry.NONE;
         var middleId = StripeElementRegistry.NONE;
@@ -40,6 +39,16 @@ class StripePanel {
             StripeElementRegistry.create(middleId),
             StripeElementRegistry.create(bottomId)
         ] as Array<StripeElement>;
+    }
+
+    private function buildBlockCenterYs() as Array<Number> {
+        var stripeWidth = TimeTileStyle.STRIPE_WIDTH;
+        var contentCenterY = TimeTileStyle.SCREEN_CENTER_Y;
+        return [
+            StripeElementLayout.blockCenterY(stripeWidth, contentCenterY, 0),
+            StripeElementLayout.blockCenterY(stripeWidth, contentCenterY, 1),
+            StripeElementLayout.blockCenterY(stripeWidth, contentCenterY, 2)
+        ] as Array<Number>;
     }
 
     // Ask each existing element to refresh if due. Does not recreate elements.
@@ -67,7 +76,7 @@ class StripePanel {
             (_elements[i] as StripeElement).draw(
                 dc,
                 _centerX,
-                _slotCenterYs[i],
+                _blockCenterYs[i],
                 _foregroundColor,
                 _stripeColor
             );

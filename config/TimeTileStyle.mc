@@ -35,14 +35,9 @@ module TimeTileStyle {
 
     // Plain vertical stripe geometry (user-tuned).
     // Runtime stripe/element colors come from StripeAppearanceConfiguration.
+    // Element size / stack Y are derived from this width via StripeElementLayout.
     const STRIPE_LEFT_X = 140;
     const STRIPE_TOP_Y = 0;
     const STRIPE_WIDTH = 60;
     const STRIPE_HEIGHT = 250;
-
-    // Stripe content slots — horizontal center derived from stripe geometry.
-    const STRIPE_CONTENT_CENTER_X = STRIPE_LEFT_X + ((STRIPE_WIDTH * 2) / 4);
-    const TOP_SLOT_CENTER_Y = 48;
-    const MIDDLE_SLOT_CENTER_Y = 104;
-    const BOTTOM_SLOT_CENTER_Y = 160;
 }

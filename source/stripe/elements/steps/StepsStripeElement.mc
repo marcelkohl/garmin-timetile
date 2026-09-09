@@ -63,8 +63,13 @@ class StepsStripeElement extends StripeElement {
 
         var iconWidth = icon.getWidth();
         var iconHeight = icon.getHeight();
-        var x = rowBounds[0] + ((rowBounds[2] - iconWidth) / 2);
-        var y = rowBounds[1] + ((rowBounds[3] - iconHeight) / 2);
+        var x = StripeElementLayout.centeredContentX(rowBounds[0], rowBounds[2], iconWidth);
+        var y = StripeElementLayout.anchoredContentY(
+            rowIndex,
+            rowBounds[1],
+            rowBounds[3],
+            iconHeight
+        );
         dc.drawBitmap(x, y, icon);
     }
 

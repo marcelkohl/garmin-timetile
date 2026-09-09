@@ -52,8 +52,13 @@ class BatteryStripeElement extends StripeElement {
         var rowHeight = rowBounds[3];
 
         var totalWidth = BatteryStripeStyle.BODY_WIDTH + BatteryStripeStyle.TERMINAL_WIDTH;
-        var bodyX = rowX + ((rowWidth - totalWidth) / 2);
-        var bodyY = rowY + ((rowHeight - BatteryStripeStyle.BODY_HEIGHT) / 2);
+        var bodyX = StripeElementLayout.centeredContentX(rowX, rowWidth, totalWidth);
+        var bodyY = StripeElementLayout.anchoredContentY(
+            rowIndex,
+            rowY,
+            rowHeight,
+            BatteryStripeStyle.BODY_HEIGHT
+        );
         var outline = BatteryStripeStyle.OUTLINE_THICKNESS;
         var innerX = bodyX + outline;
         var innerY = bodyY + outline;
