@@ -2,7 +2,7 @@ import Toybox.Graphics;
 import Toybox.Lang;
 
 // Common contract for interchangeable stripe content elements.
-// Owns the shared two-row square-block layout and generic refresh scheduling.
+// Owns the shared two-row safe-region layout and generic refresh scheduling.
 // Element-specific intervals and data fetches live in subclasses.
 class StripeElement {
 
@@ -55,31 +55,34 @@ class StripeElement {
         return elapsed >= getRefreshIntervalSeconds();
     }
 
-    // Draw this square element block centered at (centerX, centerY).
-    // foregroundColor: icon/text color; backgroundColor: stripe fill for contrast.
+    // Draw using center-anchored top/bottom safe regions for slotIndex (0..2).
     // Drawing must use cached data only — never call Garmin data APIs here.
     function draw(
         dc as Dc,
         centerX as Number,
         centerY as Number,
         foregroundColor as Number,
-        backgroundColor as Number
+        backgroundColor as Number,
+        slotIndex as Number
     ) as Void {
+        var stripeLeft = TimeTileStyle.STRIPE_LEFT_X;
         var stripeWidth = TimeTileStyle.STRIPE_WIDTH;
-        var size = StripeElementLayout.elementSize(stripeWidth);
-        var rowHeight = StripeElementLayout.rowHeight(stripeWidth);
-        var blockX = centerX - (size / 2);
-        var blockY = centerY - (size / 2);
+        var contentCenterY = TimeTileStyle.SCREEN_CENTER_Y;
 
-        var topBounds = [blockX, blockY, size, rowHeight] as Array<Number>;
+        var topBounds = StripeElementLayout.topRegionBounds(
+            stripeLeft,
+            stripeWidth,
+            contentCenterY,
+            slotIndex
+        );
         drawBoundedRow(dc, StripeElementLayout.ROW_TOP, topBounds, foregroundColor, backgroundColor);
 
-        var bottomBounds = [
-            blockX,
-            blockY + rowHeight,
-            size,
-            rowHeight
-        ] as Array<Number>;
+        var bottomBounds = StripeElementLayout.bottomRegionBounds(
+            stripeLeft,
+            stripeWidth,
+            contentCenterY,
+            slotIndex
+        );
         drawBoundedRow(dc, StripeElementLayout.ROW_BOTTOM, bottomBounds, foregroundColor, backgroundColor);
     }
 
@@ -106,7 +109,6 @@ class StripeElement {
             var dims = dc.getTextDimensions(text, font);
             var textHeight = dims[1];
             var textX = x + (width / 2);
-            // Top row: visual bottom on row bottom. Bottom row: visual top on row top.
             var textY = StripeElementLayout.anchoredContentY(rowIndex, y, height, textHeight);
             dc.setColor(textColor, Graphics.COLOR_TRANSPARENT);
             dc.drawText(
@@ -121,8 +123,6 @@ class StripeElement {
         dc.clearClip();
     }
 
-    // Override to draw an optional icon/background inside the row bounds.
-    // rowIndex: StripeElementLayout.ROW_TOP or ROW_BOTTOM.
     function drawRowIcon(
         dc as Dc,
         rowIndex as Number,
@@ -132,12 +132,10 @@ class StripeElement {
     ) as Void {
     }
 
-    // Override to supply optional text layered over the same row.
     function getRowText(rowIndex as Number) as String or Null {
         return null;
     }
 
-    // Override to choose row text color; default is the stripe foreground.
     function getRowTextColor(
         rowIndex as Number,
         foregroundColor as Number,
@@ -146,7 +144,6 @@ class StripeElement {
         return foregroundColor;
     }
 
-    // Override to choose a row-specific font; default is the shared row font.
     function getRowFont(rowIndex as Number) as FontDefinition {
         return StripeElementLayout.DEFAULT_ROW_FONT;
     }

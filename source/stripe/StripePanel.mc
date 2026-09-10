@@ -63,31 +63,36 @@ class StripePanel {
         return anyChanged;
     }
 
-    // Low-power path: refresh/redraw only capability-opted slots whose visible
-    // cached state changed. Uses one tight clip per due slot (never a union).
+    // Low-power path: clip/clear/redraw each due partial-capable slot's safe region.
     function onPartialUpdate(dc as Dc, nowSeconds as Number) as Void {
+        var stripeLeft = TimeTileStyle.STRIPE_LEFT_X;
         var stripeWidth = TimeTileStyle.STRIPE_WIDTH;
-        var size = StripeElementLayout.elementSize(stripeWidth);
-        var halfSize = size / 2;
+        var contentCenterY = TimeTileStyle.SCREEN_CENTER_Y;
 
         for (var i = 0; i < _elements.size(); i += 1) {
             var element = _elements[i] as StripeElement;
             if (!element.supportsPartialUpdates()) {
                 continue;
             }
-            // refreshIfDue: false when not due, or due but visible state unchanged.
             if (!element.refreshIfDue(nowSeconds)) {
                 continue;
             }
 
-            var centerY = _blockCenterYs[i];
-            var blockX = _centerX - halfSize;
-            var blockY = centerY - halfSize;
+            var safe = StripeElementLayout.slotSafeBounds(
+                stripeLeft,
+                stripeWidth,
+                contentCenterY,
+                i
+            );
+            var safeX = safe[0];
+            var safeY = safe[1];
+            var safeW = safe[2];
+            var safeH = safe[3];
 
-            dc.setClip(blockX, blockY, size, size);
+            dc.setClip(safeX, safeY, safeW, safeH);
             dc.setColor(_stripeColor, _stripeColor);
-            dc.fillRectangle(blockX, blockY, size, size);
-            element.draw(dc, _centerX, centerY, _foregroundColor, _stripeColor);
+            dc.fillRectangle(safeX, safeY, safeW, safeH);
+            element.draw(dc, _centerX, _blockCenterYs[i], _foregroundColor, _stripeColor, i);
         }
 
         dc.clearClip();
@@ -108,7 +113,8 @@ class StripePanel {
                 _centerX,
                 _blockCenterYs[i],
                 _foregroundColor,
-                _stripeColor
+                _stripeColor,
+                i
             );
         }
     }

@@ -20,6 +20,7 @@ JUNGLE         := monkey.jungle
 # SVG → PNG icon pipeline (host ImageMagick; generated PNGs are not committed).
 ICON_GEN_DIR   := resources/drawables/generated
 CONVERT        := $(shell command -v convert 2>/dev/null)
+SVG_SIZE       := scripts/svg-declared-size.sh
 
 STEPS_SVG            := assets/icons-src/steps.svg
 CALENDAR_TOP_SVG     := assets/icons-src/calendar_top.svg
@@ -27,7 +28,6 @@ CALENDAR_BOTTOM_SVG  := assets/icons-src/calendar_bottom.svg
 BATTERY_FRAME_SVG    := assets/icons-src/battery_frame.svg
 
 WEATHER_ICON_DIR     := assets/icons-src/weather
-WEATHER_SIZE         := 18
 WEATHER_FAMILIES     := clear partly_cloudy cloudy rain thunderstorm snow unknown
 
 STEPS_BLACK          := $(ICON_GEN_DIR)/steps_black.png
@@ -49,6 +49,7 @@ GENERATED_PNGS := \
 	$(BATTERY_BLACK) $(BATTERY_WHITE) \
 	$(WEATHER_BLACK_PNGS) $(WEATHER_WHITE_PNGS)
 
+# Fixed-size render (Calendar / Battery only in this step).
 # $1 = svg, $2 = black png out, $3 = width, $4 = height
 define render_svg_black
 	@if [ -z "$(CONVERT)" ]; then \
@@ -69,6 +70,44 @@ define negate_to_white
 	@"$(CONVERT)" "$(1)" -channel RGB -negate +channel PNG32:"$(2)"
 	@identify -format '%wx%h' "$(2)" | grep -qx '$(3)x$(4)' \
 		|| (echo "ERROR: $(2) is not $(3)x$(4)"; exit 1)
+endef
+
+# Intrinsic-size render for Steps / Weather: preserve Black, White, and alpha.
+# $1 = svg, $2 = black png out
+define render_svg_black_intrinsic
+	@if [ -z "$(CONVERT)" ]; then \
+		echo "ERROR: ImageMagick 'convert' not found on PATH."; \
+		echo "Install on Ubuntu: sudo apt install imagemagick"; \
+		exit 1; \
+	fi
+	@if [ ! -x "$(SVG_SIZE)" ]; then chmod +x "$(SVG_SIZE)"; fi
+	@declared="$$($(SVG_SIZE) "$(1)")"; \
+	echo "Generating $(2) (intrinsic $$declared) from $(1)..."; \
+	"$(CONVERT)" -background none "$(1)" PNG32:"$(2)"; \
+	got="$$(identify -format '%wx%h' "$(2)")"; \
+	if [ "$$got" != "$$declared" ]; then \
+		echo "ERROR: $(1) declares $$declared"; \
+		echo "but generated $(2) is $$got"; \
+		exit 1; \
+	fi; \
+	opaque="$$("$(CONVERT)" "$(2)" -alpha extract -format '%[fx:maxima]' info:)"; \
+	opaque_int="$$(echo "$$opaque" | awk '{printf "%d", ($$1>0)?1:0}')"; \
+	if [ "$$opaque_int" -le 0 ]; then \
+		echo "ERROR: $(2) is completely transparent (from $(1))"; \
+		exit 1; \
+	fi
+endef
+
+# $1 = black png, $2 = white png out, $3 = source svg (for error text)
+define negate_to_white_intrinsic
+	@echo "Generating $(2) from $(1) (RGB invert, alpha unchanged)..."
+	@"$(CONVERT)" "$(1)" -channel RGB -negate +channel PNG32:"$(2)"
+	@black_wh="$$(identify -format '%wx%h' "$(1)")"; \
+	white_wh="$$(identify -format '%wx%h' "$(2)")"; \
+	if [ "$$black_wh" != "$$white_wh" ]; then \
+		echo "ERROR: $(3): Black $$black_wh and White $$white_wh dimensions differ"; \
+		exit 1; \
+	fi
 endef
 
 # Resolve active SDK path from current-sdk.cfg (supports SDK root or .../bin).
@@ -164,11 +203,11 @@ assets: $(GENERATED_PNGS)
 $(ICON_GEN_DIR):
 	@mkdir -p "$(ICON_GEN_DIR)"
 
-$(STEPS_BLACK): $(STEPS_SVG) | $(ICON_GEN_DIR)
-	$(call render_svg_black,$(STEPS_SVG),$(STEPS_BLACK),16,16)
+$(STEPS_BLACK): $(STEPS_SVG) $(SVG_SIZE) | $(ICON_GEN_DIR)
+	$(call render_svg_black_intrinsic,$(STEPS_SVG),$(STEPS_BLACK))
 
 $(STEPS_WHITE): $(STEPS_BLACK)
-	$(call negate_to_white,$(STEPS_BLACK),$(STEPS_WHITE),16,16)
+	$(call negate_to_white_intrinsic,$(STEPS_BLACK),$(STEPS_WHITE),$(STEPS_SVG))
 
 $(CAL_TOP_BLACK): $(CALENDAR_TOP_SVG) | $(ICON_GEN_DIR)
 	$(call render_svg_black,$(CALENDAR_TOP_SVG),$(CAL_TOP_BLACK),30,18)
@@ -188,13 +227,13 @@ $(BATTERY_BLACK): $(BATTERY_FRAME_SVG) | $(ICON_GEN_DIR)
 $(BATTERY_WHITE): $(BATTERY_BLACK)
 	$(call negate_to_white,$(BATTERY_BLACK),$(BATTERY_WHITE),30,16)
 
-# Weather families: one SVG → black PNG → white PNG (18×18).
+# Weather families: intrinsic size per SVG (no forced 18×18).
 define weather_icon_rules
-$(ICON_GEN_DIR)/weather_$(1)_black.png: $(WEATHER_ICON_DIR)/$(1).svg | $(ICON_GEN_DIR)
-	$$(call render_svg_black,$(WEATHER_ICON_DIR)/$(1).svg,$(ICON_GEN_DIR)/weather_$(1)_black.png,$(WEATHER_SIZE),$(WEATHER_SIZE))
+$(ICON_GEN_DIR)/weather_$(1)_black.png: $(WEATHER_ICON_DIR)/$(1).svg $(SVG_SIZE) | $(ICON_GEN_DIR)
+	$$(call render_svg_black_intrinsic,$(WEATHER_ICON_DIR)/$(1).svg,$(ICON_GEN_DIR)/weather_$(1)_black.png)
 
 $(ICON_GEN_DIR)/weather_$(1)_white.png: $(ICON_GEN_DIR)/weather_$(1)_black.png
-	$$(call negate_to_white,$(ICON_GEN_DIR)/weather_$(1)_black.png,$(ICON_GEN_DIR)/weather_$(1)_white.png,$(WEATHER_SIZE),$(WEATHER_SIZE))
+	$$(call negate_to_white_intrinsic,$(ICON_GEN_DIR)/weather_$(1)_black.png,$(ICON_GEN_DIR)/weather_$(1)_white.png,$(WEATHER_ICON_DIR)/$(1).svg)
 endef
 
 $(foreach family,$(WEATHER_FAMILIES),$(eval $(call weather_icon_rules,$(family))))

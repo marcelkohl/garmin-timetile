@@ -10,6 +10,8 @@ class StepsStripeElement extends StripeElement {
     private var _stepsText as String;
     private var _iconWhite as BitmapResource;
     private var _iconBlack as BitmapResource;
+    private var _iconWidth as Number;
+    private var _iconHeight as Number;
 
     function initialize() {
         StripeElement.initialize();
@@ -18,6 +20,8 @@ class StepsStripeElement extends StripeElement {
         // Load both variants once; draw selects from the passed foregroundColor.
         _iconWhite = WatchUi.loadResource($.Rez.Drawables.StepsIconWhite) as BitmapResource;
         _iconBlack = WatchUi.loadResource($.Rez.Drawables.StepsIconBlack) as BitmapResource;
+        _iconWidth = _iconWhite.getWidth();
+        _iconHeight = _iconWhite.getHeight();
     }
 
     function getRefreshIntervalSeconds() as Number {
@@ -65,9 +69,10 @@ class StepsStripeElement extends StripeElement {
             icon = _iconBlack;
         }
 
-        var iconWidth = icon.getWidth();
-        var iconHeight = icon.getHeight();
+        var iconWidth = _iconWidth;
+        var iconHeight = _iconHeight;
         var x = StripeElementLayout.centeredContentX(rowBounds[0], rowBounds[2], iconWidth);
+        // Bottom-anchored at the center: bitmapY = anchorY - bitmapHeight.
         var y = StripeElementLayout.anchoredContentY(
             rowIndex,
             rowBounds[1],

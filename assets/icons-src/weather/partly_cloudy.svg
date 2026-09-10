@@ -1,0 +1,13 @@
+<svg width="25" height="25" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" enable-background="new 0 0 25 25" version="1.1">
+
+ <g>
+  <title>Layer 1</title>
+  <polygon id="svg_1" points="  13,4 11,6 11,9 13,11 16,11 18,9 18,6 16,4 13,4 " stroke-miterlimit="10" stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="#000000" fill="#ffff00" display="inline"/>
+  <line id="svg_2" y2="3" x2="9" y1="1" x1="7" stroke-miterlimit="10" stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="#000000" fill="none" display="inline"/>
+  <line id="svg_3" y2="3" x2="20" y1="1" x1="22" stroke-miterlimit="10" stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="#000000" fill="none" display="inline"/>
+  <polygon id="svg_4" points="  22,24 24,22 24,18 22,16 16,16 13,13 9,13 6,16 3,16 1,18 1,22 3,24 22,24 " stroke-miterlimit="10" stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="#000000" fill="#FFFFFF" display="inline"/>
+  <path id="svg_5" d="m6,16l3,3" opacity="undefined" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="#000000" fill="none"/>
+  <line id="svg_6" y2="8" x2="24" y1="8" x1="21" stroke-miterlimit="10" stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="#000000" fill="none" display="inline"/>
+  <line id="svg_7" y2="8" x2="8" y1="8" x1="5" stroke-miterlimit="10" stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="#000000" fill="none" display="inline"/>
+ </g>
+</svg>

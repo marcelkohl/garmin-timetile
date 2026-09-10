@@ -25,8 +25,8 @@ module StripeElementLayout {
         return size;
     }
 
-    function rowHeight(stripeWidth as Number) as Number {
-        return elementSize(stripeWidth) / 2;
+    function halfGap() as Number {
+        return ELEMENT_GAP / 2;
     }
 
     function stackHeight(stripeWidth as Number) as Number {
@@ -56,11 +56,80 @@ module StripeElementLayout {
         return blockTopY(stripeWidth, contentCenterY, index) + (elementSize(stripeWidth) / 2);
     }
 
+    function safeTopY(stripeWidth as Number, contentCenterY as Number, index as Number) as Number {
+        var blockY = blockTopY(stripeWidth, contentCenterY, index);
+        var top = blockY - halfGap();
+        var stripeTop = TimeTileStyle.STRIPE_TOP_Y;
+        if (top < stripeTop) {
+            return stripeTop;
+        }
+        if (top < 0) {
+            return 0;
+        }
+        return top;
+    }
+
+    // Exclusive bottom edge so neighboring safe regions meet without overlapping.
+    function safeBottomY(stripeWidth as Number, contentCenterY as Number, index as Number) as Number {
+        var blockY = blockTopY(stripeWidth, contentCenterY, index);
+        var size = elementSize(stripeWidth);
+        var bottom = blockY + size + halfGap();
+        var stripeBottom = TimeTileStyle.STRIPE_TOP_Y + TimeTileStyle.STRIPE_HEIGHT;
+        if (bottom > stripeBottom) {
+            return stripeBottom;
+        }
+        return bottom;
+    }
+
+    function anchorY(stripeWidth as Number, contentCenterY as Number, index as Number) as Number {
+        return blockCenterY(stripeWidth, contentCenterY, index);
+    }
+
+    function topRegionBounds(
+        stripeLeftX as Number,
+        stripeWidth as Number,
+        contentCenterY as Number,
+        index as Number
+    ) as Array<Number> {
+        var left = elementLeftX(stripeLeftX, stripeWidth);
+        var size = elementSize(stripeWidth);
+        var top = safeTopY(stripeWidth, contentCenterY, index);
+        var mid = anchorY(stripeWidth, contentCenterY, index);
+        return [left, top, size, mid - top] as Array<Number>;
+    }
+
+    function bottomRegionBounds(
+        stripeLeftX as Number,
+        stripeWidth as Number,
+        contentCenterY as Number,
+        index as Number
+    ) as Array<Number> {
+        var left = elementLeftX(stripeLeftX, stripeWidth);
+        var size = elementSize(stripeWidth);
+        var mid = anchorY(stripeWidth, contentCenterY, index);
+        var bottom = safeBottomY(stripeWidth, contentCenterY, index);
+        return [left, mid, size, bottom - mid] as Array<Number>;
+    }
+
+    function slotSafeBounds(
+        stripeLeftX as Number,
+        stripeWidth as Number,
+        contentCenterY as Number,
+        index as Number
+    ) as Array<Number> {
+        var left = elementLeftX(stripeLeftX, stripeWidth);
+        var size = elementSize(stripeWidth);
+        var top = safeTopY(stripeWidth, contentCenterY, index);
+        var bottom = safeBottomY(stripeWidth, contentCenterY, index);
+        return [left, top, size, bottom - top] as Array<Number>;
+    }
+
     function centeredContentX(rowX as Number, rowWidth as Number, contentWidth as Number) as Number {
         return rowX + ((rowWidth - contentWidth) / 2);
     }
 
-    // Top row: content bottom-aligned. Bottom row: content top-aligned.
+    // Top: bottom-anchored at region bottom (center anchor).
+    // Bottom: top-anchored at region top (center anchor).
     function anchoredContentY(
         rowIndex as Number,
         rowY as Number,

@@ -13,6 +13,8 @@ class WeatherStripeElement extends StripeElement {
     private var _temperatureText as String;
     private var _currentIconWhite as BitmapResource or Null;
     private var _currentIconBlack as BitmapResource or Null;
+    private var _iconWidth as Number;
+    private var _iconHeight as Number;
 
     function initialize() {
         StripeElement.initialize();
@@ -21,6 +23,8 @@ class WeatherStripeElement extends StripeElement {
         _temperatureText = "--";
         _currentIconWhite = null;
         _currentIconBlack = null;
+        _iconWidth = 0;
+        _iconHeight = 0;
     }
 
     function getRefreshIntervalSeconds() as Number {
@@ -73,8 +77,8 @@ class WeatherStripeElement extends StripeElement {
             icon = _currentIconBlack as BitmapResource;
         }
 
-        var iconWidth = icon.getWidth();
-        var iconHeight = icon.getHeight();
+        var iconWidth = _iconWidth;
+        var iconHeight = _iconHeight;
         var x = StripeElementLayout.centeredContentX(rowBounds[0], rowBounds[2], iconWidth);
         var y = StripeElementLayout.anchoredContentY(
             rowIndex,
@@ -110,6 +114,8 @@ class WeatherStripeElement extends StripeElement {
         _iconFamily = family;
         _currentIconWhite = WeatherIconCatalog.loadWhite(family);
         _currentIconBlack = WeatherIconCatalog.loadBlack(family);
+        _iconWidth = (_currentIconWhite as BitmapResource).getWidth();
+        _iconHeight = (_currentIconWhite as BitmapResource).getHeight();
         return true;
     }
 
