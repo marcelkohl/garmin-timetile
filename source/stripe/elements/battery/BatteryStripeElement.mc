@@ -72,27 +72,69 @@ class BatteryStripeElement extends StripeElement {
             _frameHeight
         );
 
-        var maxFillWidth = BatteryStripeStyle.INNER_FILL_MAX_WIDTH;
-        var fillWidth = (maxFillWidth * _percentage) / 100;
+        // 1) Frame bitmap first (white interior is opaque).
+        dc.drawBitmap(frameX, frameY, frame);
+
+        // 2) Charge bar above the SVG, attached to the same frame origin.
+        drawChargeBar(dc, frameX, frameY, foregroundColor);
+    }
+
+    // Draw the percentage fill relative to frameX/frameY, clamped to the bitmap.
+    private function drawChargeBar(
+        dc as Dc,
+        frameX as Number,
+        frameY as Number,
+        foregroundColor as Number
+    ) as Void {
+        // Clamp configured rectangle against loaded bitmap bounds.
+        var startX = BatteryStripeStyle.FILL_START_X;
+        var startY = BatteryStripeStyle.FILL_START_Y;
+        var maxWidth = BatteryStripeStyle.FILL_MAX_WIDTH;
+        var thickness = BatteryStripeStyle.FILL_THICKNESS;
+
+        if (startX < 0) {
+            startX = 0;
+        }
+        if (startY < 0) {
+            startY = 0;
+        }
+        if (startX >= _frameWidth) {
+            return;
+        }
+        if (startY >= _frameHeight) {
+            return;
+        }
+
+        var maxWInside = _frameWidth - startX;
+        var maxHInside = _frameHeight - startY;
+        if (maxWidth > maxWInside) {
+            maxWidth = maxWInside;
+        }
+        if (thickness > maxHInside) {
+            thickness = maxHInside;
+        }
+        if ((maxWidth <= 0) || (thickness <= 0)) {
+            return;
+        }
+
+        var fillWidth = (maxWidth * _percentage) / 100;
         if (fillWidth < 0) {
             fillWidth = 0;
         }
-        if (fillWidth > maxFillWidth) {
-            fillWidth = maxFillWidth;
+        if (fillWidth > maxWidth) {
+            fillWidth = maxWidth;
+        }
+        if (fillWidth <= 0) {
+            return;
         }
 
-        // Fill under the frame; unfilled area shows stripe through transparent interior.
-        if (fillWidth > 0) {
-            dc.setColor(foregroundColor, foregroundColor);
-            dc.fillRectangle(
-                frameX + BatteryStripeStyle.INNER_FILL_X,
-                frameY + BatteryStripeStyle.INNER_FILL_Y,
-                fillWidth,
-                BatteryStripeStyle.INNER_FILL_HEIGHT
-            );
-        }
-
-        dc.drawBitmap(frameX, frameY, frame);
+        dc.setColor(foregroundColor, foregroundColor);
+        dc.fillRectangle(
+            frameX + startX,
+            frameY + startY,
+            fillWidth,
+            thickness
+        );
     }
 
     function getRowText(rowIndex as Number) as String or Null {
