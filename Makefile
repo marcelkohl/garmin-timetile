@@ -18,9 +18,11 @@ SETTINGS_DEST  := GARMIN/Settings/$(APP_NAME)_$(DEVICE)-settings.json
 JUNGLE         := monkey.jungle
 
 # SVG → PNG icon pipeline (host ImageMagick; generated PNGs are not committed).
+# Colors are preserved. Optional *_on_dark.svg selects dark-stripe artwork.
 ICON_GEN_DIR   := resources/drawables/generated
 CONVERT        := $(shell command -v convert 2>/dev/null)
 SVG_SIZE       := scripts/svg-declared-size.sh
+RENDER_PAIR    := scripts/render-svg-contrast-pair.sh
 
 STEPS_SVG            := assets/icons-src/steps.svg
 CALENDAR_TOP_SVG     := assets/icons-src/calendar_top.svg
@@ -30,85 +32,32 @@ BATTERY_FRAME_SVG    := assets/icons-src/battery_frame.svg
 WEATHER_ICON_DIR     := assets/icons-src/weather
 WEATHER_FAMILIES     := clear partly_cloudy cloudy rain thunderstorm snow unknown
 
-STEPS_BLACK          := $(ICON_GEN_DIR)/steps_black.png
-STEPS_WHITE          := $(ICON_GEN_DIR)/steps_white.png
-CAL_TOP_BLACK        := $(ICON_GEN_DIR)/calendar_top_black.png
-CAL_TOP_WHITE        := $(ICON_GEN_DIR)/calendar_top_white.png
-CAL_BOTTOM_BLACK     := $(ICON_GEN_DIR)/calendar_bottom_black.png
-CAL_BOTTOM_WHITE     := $(ICON_GEN_DIR)/calendar_bottom_white.png
-BATTERY_BLACK        := $(ICON_GEN_DIR)/battery_frame_black.png
-BATTERY_WHITE        := $(ICON_GEN_DIR)/battery_frame_white.png
+STEPS_ON_LIGHT           := $(ICON_GEN_DIR)/steps_on_light.png
+STEPS_ON_DARK            := $(ICON_GEN_DIR)/steps_on_dark.png
+CAL_TOP_ON_LIGHT         := $(ICON_GEN_DIR)/calendar_top_on_light.png
+CAL_TOP_ON_DARK          := $(ICON_GEN_DIR)/calendar_top_on_dark.png
+CAL_BOTTOM_ON_LIGHT      := $(ICON_GEN_DIR)/calendar_bottom_on_light.png
+CAL_BOTTOM_ON_DARK       := $(ICON_GEN_DIR)/calendar_bottom_on_dark.png
+BATTERY_ON_LIGHT         := $(ICON_GEN_DIR)/battery_frame_on_light.png
+BATTERY_ON_DARK          := $(ICON_GEN_DIR)/battery_frame_on_dark.png
 
-WEATHER_BLACK_PNGS := $(foreach f,$(WEATHER_FAMILIES),$(ICON_GEN_DIR)/weather_$(f)_black.png)
-WEATHER_WHITE_PNGS := $(foreach f,$(WEATHER_FAMILIES),$(ICON_GEN_DIR)/weather_$(f)_white.png)
+WEATHER_ON_LIGHT_PNGS := $(foreach f,$(WEATHER_FAMILIES),$(ICON_GEN_DIR)/weather_$(f)_on_light.png)
+WEATHER_ON_DARK_PNGS  := $(foreach f,$(WEATHER_FAMILIES),$(ICON_GEN_DIR)/weather_$(f)_on_dark.png)
 
 GENERATED_PNGS := \
-	$(STEPS_BLACK) $(STEPS_WHITE) \
-	$(CAL_TOP_BLACK) $(CAL_TOP_WHITE) \
-	$(CAL_BOTTOM_BLACK) $(CAL_BOTTOM_WHITE) \
-	$(BATTERY_BLACK) $(BATTERY_WHITE) \
-	$(WEATHER_BLACK_PNGS) $(WEATHER_WHITE_PNGS)
+	$(STEPS_ON_LIGHT) $(STEPS_ON_DARK) \
+	$(CAL_TOP_ON_LIGHT) $(CAL_TOP_ON_DARK) \
+	$(CAL_BOTTOM_ON_LIGHT) $(CAL_BOTTOM_ON_DARK) \
+	$(BATTERY_ON_LIGHT) $(BATTERY_ON_DARK) \
+	$(WEATHER_ON_LIGHT_PNGS) $(WEATHER_ON_DARK_PNGS)
 
-# Fixed-size render (Calendar / Battery only in this step).
-# $1 = svg, $2 = black png out, $3 = width, $4 = height
-define render_svg_black
-	@if [ -z "$(CONVERT)" ]; then \
-		echo "ERROR: ImageMagick 'convert' not found on PATH."; \
-		echo "Install on Ubuntu: sudo apt install imagemagick"; \
-		echo "Preferred alternative: sudo apt install librsvg2-bin  (rsvg-convert)"; \
-		exit 1; \
-	fi
-	@echo "Generating $(2) ($(3)x$(4)) from $(1)..."
-	@"$(CONVERT)" -background none -size $(3)x$(4) "$(1)" PNG32:"$(2)"
-	@identify -format '%wx%h' "$(2)" | grep -qx '$(3)x$(4)' \
-		|| (echo "ERROR: $(2) is not $(3)x$(4)"; exit 1)
-endef
-
-# $1 = black png, $2 = white png out, $3 = width, $4 = height
-define negate_to_white
-	@echo "Generating $(2) from $(1)..."
-	@"$(CONVERT)" "$(1)" -channel RGB -negate +channel PNG32:"$(2)"
-	@identify -format '%wx%h' "$(2)" | grep -qx '$(3)x$(4)' \
-		|| (echo "ERROR: $(2) is not $(3)x$(4)"; exit 1)
-endef
-
-# Intrinsic-size render for Steps / Weather: preserve Black, White, and alpha.
-# $1 = svg, $2 = black png out
-define render_svg_black_intrinsic
-	@if [ -z "$(CONVERT)" ]; then \
-		echo "ERROR: ImageMagick 'convert' not found on PATH."; \
-		echo "Install on Ubuntu: sudo apt install imagemagick"; \
-		exit 1; \
-	fi
-	@if [ ! -x "$(SVG_SIZE)" ]; then chmod +x "$(SVG_SIZE)"; fi
-	@declared="$$($(SVG_SIZE) "$(1)")"; \
-	echo "Generating $(2) (intrinsic $$declared) from $(1)..."; \
-	"$(CONVERT)" -background none "$(1)" PNG32:"$(2)"; \
-	got="$$(identify -format '%wx%h' "$(2)")"; \
-	if [ "$$got" != "$$declared" ]; then \
-		echo "ERROR: $(1) declares $$declared"; \
-		echo "but generated $(2) is $$got"; \
-		exit 1; \
-	fi; \
-	opaque="$$("$(CONVERT)" "$(2)" -alpha extract -format '%[fx:maxima]' info:)"; \
-	opaque_int="$$(echo "$$opaque" | awk '{printf "%d", ($$1>0)?1:0}')"; \
-	if [ "$$opaque_int" -le 0 ]; then \
-		echo "ERROR: $(2) is completely transparent (from $(1))"; \
-		exit 1; \
-	fi
-endef
-
-# $1 = black png, $2 = white png out, $3 = source svg (for error text)
-define negate_to_white_intrinsic
-	@echo "Generating $(2) from $(1) (RGB invert, alpha unchanged)..."
-	@"$(CONVERT)" "$(1)" -channel RGB -negate +channel PNG32:"$(2)"
-	@black_wh="$$(identify -format '%wx%h' "$(1)")"; \
-	white_wh="$$(identify -format '%wx%h' "$(2)")"; \
-	if [ "$$black_wh" != "$$white_wh" ]; then \
-		echo "ERROR: $(3): Black $$black_wh and White $$white_wh dimensions differ"; \
-		exit 1; \
-	fi
-endef
+# Legacy Black/White names from earlier pipelines (removed on clean).
+LEGACY_PNGS := \
+	$(ICON_GEN_DIR)/steps_black.png $(ICON_GEN_DIR)/steps_white.png \
+	$(ICON_GEN_DIR)/calendar_top_black.png $(ICON_GEN_DIR)/calendar_top_white.png \
+	$(ICON_GEN_DIR)/calendar_bottom_black.png $(ICON_GEN_DIR)/calendar_bottom_white.png \
+	$(ICON_GEN_DIR)/battery_frame_black.png $(ICON_GEN_DIR)/battery_frame_white.png \
+	$(foreach f,$(WEATHER_FAMILIES),$(ICON_GEN_DIR)/weather_$(f)_black.png $(ICON_GEN_DIR)/weather_$(f)_white.png)
 
 # Resolve active SDK path from current-sdk.cfg (supports SDK root or .../bin).
 SDK_PATH_RAW := $(shell tr -d '\r\n' < "$(SDK_CFG)" 2>/dev/null | sed 's:/*$$::')
@@ -126,7 +75,6 @@ CONNECTIQ := $(SDK_BIN)/connectiq
 DEVICE_PKG := $(DEVICES_DIR)/$(DEVICE)
 
 # Run a command inside the Distrobox container, preserving project cwd.
-# Usage: $(call in_container,command with "quoted" args)
 define in_container
 distrobox enter "$(CONTAINER)" -- bash --noprofile --norc -c $(1)
 endef
@@ -196,44 +144,43 @@ check:
 	fi; \
 	exit $$status
 
-# Generate white/black PNG variants from SVG sources (host-side).
+# Preserve SVG colors; optional *_on_dark.svg; else reuse base PNG bytes.
 assets: $(GENERATED_PNGS)
-	@echo "OK: generated Steps, Calendar, Battery, and Weather icon PNGs"
+	@echo "OK: generated OnLight/OnDark icon PNGs"
 
 $(ICON_GEN_DIR):
 	@mkdir -p "$(ICON_GEN_DIR)"
 
-$(STEPS_BLACK): $(STEPS_SVG) $(SVG_SIZE) | $(ICON_GEN_DIR)
-	$(call render_svg_black_intrinsic,$(STEPS_SVG),$(STEPS_BLACK))
+define render_contrast_pair
+	@if [ ! -x "$(RENDER_PAIR)" ]; then chmod +x "$(RENDER_PAIR)"; fi
+	@SVG_SIZE="$(SVG_SIZE)" "$(RENDER_PAIR)" "$(1)" "$(2)" "$(3)"
+endef
 
-$(STEPS_WHITE): $(STEPS_BLACK)
-	$(call negate_to_white_intrinsic,$(STEPS_BLACK),$(STEPS_WHITE),$(STEPS_SVG))
+$(STEPS_ON_LIGHT): $(STEPS_SVG) $(RENDER_PAIR) $(SVG_SIZE) | $(ICON_GEN_DIR)
+	$(call render_contrast_pair,$(STEPS_SVG),$(STEPS_ON_LIGHT),$(STEPS_ON_DARK))
 
-$(CAL_TOP_BLACK): $(CALENDAR_TOP_SVG) | $(ICON_GEN_DIR)
-	$(call render_svg_black,$(CALENDAR_TOP_SVG),$(CAL_TOP_BLACK),30,18)
+$(STEPS_ON_DARK): $(STEPS_ON_LIGHT)
 
-$(CAL_TOP_WHITE): $(CAL_TOP_BLACK)
-	$(call negate_to_white,$(CAL_TOP_BLACK),$(CAL_TOP_WHITE),30,18)
+$(CAL_TOP_ON_LIGHT): $(CALENDAR_TOP_SVG) $(RENDER_PAIR) $(SVG_SIZE) | $(ICON_GEN_DIR)
+	$(call render_contrast_pair,$(CALENDAR_TOP_SVG),$(CAL_TOP_ON_LIGHT),$(CAL_TOP_ON_DARK))
 
-$(CAL_BOTTOM_BLACK): $(CALENDAR_BOTTOM_SVG) | $(ICON_GEN_DIR)
-	$(call render_svg_black,$(CALENDAR_BOTTOM_SVG),$(CAL_BOTTOM_BLACK),30,18)
+$(CAL_TOP_ON_DARK): $(CAL_TOP_ON_LIGHT)
 
-$(CAL_BOTTOM_WHITE): $(CAL_BOTTOM_BLACK)
-	$(call negate_to_white,$(CAL_BOTTOM_BLACK),$(CAL_BOTTOM_WHITE),30,18)
+$(CAL_BOTTOM_ON_LIGHT): $(CALENDAR_BOTTOM_SVG) $(RENDER_PAIR) $(SVG_SIZE) | $(ICON_GEN_DIR)
+	$(call render_contrast_pair,$(CALENDAR_BOTTOM_SVG),$(CAL_BOTTOM_ON_LIGHT),$(CAL_BOTTOM_ON_DARK))
 
-$(BATTERY_BLACK): $(BATTERY_FRAME_SVG) | $(ICON_GEN_DIR)
-	$(call render_svg_black,$(BATTERY_FRAME_SVG),$(BATTERY_BLACK),30,16)
+$(CAL_BOTTOM_ON_DARK): $(CAL_BOTTOM_ON_LIGHT)
 
-$(BATTERY_WHITE): $(BATTERY_BLACK)
-	$(call negate_to_white,$(BATTERY_BLACK),$(BATTERY_WHITE),30,16)
+$(BATTERY_ON_LIGHT): $(BATTERY_FRAME_SVG) $(RENDER_PAIR) $(SVG_SIZE) | $(ICON_GEN_DIR)
+	$(call render_contrast_pair,$(BATTERY_FRAME_SVG),$(BATTERY_ON_LIGHT),$(BATTERY_ON_DARK))
 
-# Weather families: intrinsic size per SVG (no forced 18×18).
+$(BATTERY_ON_DARK): $(BATTERY_ON_LIGHT)
+
 define weather_icon_rules
-$(ICON_GEN_DIR)/weather_$(1)_black.png: $(WEATHER_ICON_DIR)/$(1).svg $(SVG_SIZE) | $(ICON_GEN_DIR)
-	$$(call render_svg_black_intrinsic,$(WEATHER_ICON_DIR)/$(1).svg,$(ICON_GEN_DIR)/weather_$(1)_black.png)
+$(ICON_GEN_DIR)/weather_$(1)_on_light.png: $(WEATHER_ICON_DIR)/$(1).svg $(RENDER_PAIR) $(SVG_SIZE) | $(ICON_GEN_DIR)
+	$$(call render_contrast_pair,$(WEATHER_ICON_DIR)/$(1).svg,$(ICON_GEN_DIR)/weather_$(1)_on_light.png,$(ICON_GEN_DIR)/weather_$(1)_on_dark.png)
 
-$(ICON_GEN_DIR)/weather_$(1)_white.png: $(ICON_GEN_DIR)/weather_$(1)_black.png
-	$$(call negate_to_white_intrinsic,$(ICON_GEN_DIR)/weather_$(1)_black.png,$(ICON_GEN_DIR)/weather_$(1)_white.png,$(WEATHER_ICON_DIR)/$(1).svg)
+$(ICON_GEN_DIR)/weather_$(1)_on_dark.png: $(ICON_GEN_DIR)/weather_$(1)_on_light.png
 endef
 
 $(foreach family,$(WEATHER_FAMILIES),$(eval $(call weather_icon_rules,$(family))))
@@ -254,7 +201,7 @@ build: check assets
 
 clean:
 	@rm -rf "$(BUILD_DIR)"
-	@rm -f $(GENERATED_PNGS)
+	@rm -f $(GENERATED_PNGS) $(LEGACY_PNGS)
 	@echo "OK: removed $(BUILD_DIR)/ and generated icon PNGs"
 
 simulator:

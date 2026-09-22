@@ -8,8 +8,8 @@ class StepsStripeElement extends StripeElement {
 
     private var _steps as Number;
     private var _stepsText as String;
-    private var _iconWhite as BitmapResource;
-    private var _iconBlack as BitmapResource;
+    private var _iconOnLight as BitmapResource;
+    private var _iconOnDark as BitmapResource;
     private var _iconWidth as Number;
     private var _iconHeight as Number;
 
@@ -17,11 +17,10 @@ class StepsStripeElement extends StripeElement {
         StripeElement.initialize();
         _steps = 0;
         _stepsText = "0";
-        // Load both variants once; draw selects from the passed foregroundColor.
-        _iconWhite = WatchUi.loadResource($.Rez.Drawables.StepsIconWhite) as BitmapResource;
-        _iconBlack = WatchUi.loadResource($.Rez.Drawables.StepsIconBlack) as BitmapResource;
-        _iconWidth = _iconWhite.getWidth();
-        _iconHeight = _iconWhite.getHeight();
+        _iconOnLight = WatchUi.loadResource($.Rez.Drawables.StepsIconOnLight) as BitmapResource;
+        _iconOnDark = WatchUi.loadResource($.Rez.Drawables.StepsIconOnDark) as BitmapResource;
+        _iconWidth = _iconOnLight.getWidth();
+        _iconHeight = _iconOnLight.getHeight();
     }
 
     function getRefreshIntervalSeconds() as Number {
@@ -58,26 +57,24 @@ class StepsStripeElement extends StripeElement {
         rowIndex as Number,
         rowBounds as Array<Number>,
         foregroundColor as Number,
-        backgroundColor as Number
+        backgroundColor as Number,
+        iconVariant as Number
     ) as Void {
         if (rowIndex != StripeElementLayout.ROW_TOP) {
             return;
         }
 
-        var icon = _iconWhite;
-        if (foregroundColor == Graphics.COLOR_BLACK) {
-            icon = _iconBlack;
+        var icon = _iconOnLight;
+        if (iconVariant == StripeIconVariant.ON_DARK) {
+            icon = _iconOnDark;
         }
 
-        var iconWidth = _iconWidth;
-        var iconHeight = _iconHeight;
-        var x = StripeElementLayout.centeredContentX(rowBounds[0], rowBounds[2], iconWidth);
-        // Bottom-anchored at the center: bitmapY = anchorY - bitmapHeight.
+        var x = StripeElementLayout.centeredContentX(rowBounds[0], rowBounds[2], _iconWidth);
         var y = StripeElementLayout.anchoredContentY(
             rowIndex,
             rowBounds[1],
             rowBounds[3],
-            iconHeight
+            _iconHeight
         );
         dc.drawBitmap(x, y, icon);
     }

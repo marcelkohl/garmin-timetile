@@ -79,24 +79,50 @@ make build DEVELOPER_KEY="$HOME/.config/garmin-connect-iq/developer_key.der"
 
 SVG files under `assets/icons-src/` are the editable source of truth. Connect IQ
 does not render SVG at runtime — `make assets` converts them to transparent PNG
-bitmaps under `resources/drawables/generated/` (white and black variants).
+bitmaps under `resources/drawables/generated/`.
 
-- **Steps:** one SVG icon (`steps.svg`, 16×16).
-- **Calendar:** separate top-row and bottom-row SVG backgrounds
-  (`calendar_top.svg`, `calendar_bottom.svg`, 30×18); weekday/day text stays
-  dynamic and is overlaid at runtime. Bitmap size is Calendar-local; rows stay
-  derived from stripe geometry.
-- **Battery:** one SVG frame (`battery_frame.svg`, 30×16); Black/White variants
-  are generated. The percentage fill remains dynamic Monkey C drawing and must
-  stay aligned with Battery-local fill geometry if the SVG changes.
+### Contrast model (OnLight / OnDark)
+
+- SVG colors, white fills, black outlines, transparency, dimensions, and layer
+  composition are preserved. The pipeline does **not** invert, recolor,
+  threshold, trim, or resize artwork.
+- Each icon has a required base SVG designed for a **light** stripe background
+  (e.g. `steps.svg`, `weather/partly_cloudy.svg`).
+- An optional manually authored `*_on_dark.svg` may provide artwork for a
+  **dark** stripe background (e.g. `steps_on_dark.svg`). Do not create
+  placeholder dark variants.
+- If the dark SVG is missing, the base PNG is reused byte-for-byte for
+  `*_on_dark.png`. There is no automatic color inversion.
+- Full-color icons may therefore use the same artwork for both modes.
+- Stripe color selects OnLight vs OnDark at runtime. The settings value
+  **Text and dynamic color** (`stripeForegroundColor`) controls text and
+  dynamic fills (e.g. battery bar) only — it does **not** recolor SVG bitmaps.
+
+### Sources
+
+- **Steps:** `steps.svg` (intrinsic size from the SVG).
+- **Calendar:** `calendar_top.svg`, `calendar_bottom.svg`; weekday/day text
+  stays dynamic and is overlaid at runtime.
+- **Battery:** `battery_frame.svg`; percentage fill remains dynamic Monkey C
+  drawing and must stay aligned with Battery-local fill geometry if the SVG
+  changes.
 - **Weather:** seven family SVGs under `assets/icons-src/weather/`
   (`clear`, `partly_cloudy`, `cloudy`, `rain`, `thunderstorm`, `snow`,
-  `unknown`, each 18×18). Garmin conditions map to these visual families;
-  `unknown.svg` is the fallback. Each family produces Black and White PNG
-  variants. Replace an SVG and run `make assets` to update that icon.
+  `unknown`). Garmin conditions map to these visual families; `unknown.svg`
+  is the fallback.
+
+### Device notes (FR55 MIP)
+
+- Pixel-aligned 2-pixel strokes are usually more reliable on FR55 MIP.
+- Thin, diagonal, curved, or antialiased edges may dither on the device palette.
+- Generated PNGs are inspected before compilation; some edge gray/AA may already
+  exist in the PNG and is distinct from additional dither after Garmin packaging.
+
+### Workflow
+
 - Run `make assets` after editing an SVG.
 - `make build` / `make run` generate assets automatically.
-- Keep shapes simple and readable at these sizes (no gradients/filters).
+- Keep shapes simple and readable at icon sizes (no gradients/filters).
 - Generated PNGs are gitignored; commit the SVG sources only.
 
 Requires ImageMagick `convert` on the host (`sudo apt install imagemagick`).

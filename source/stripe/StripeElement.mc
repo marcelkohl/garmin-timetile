@@ -56,6 +56,7 @@ class StripeElement {
     }
 
     // Draw using center-anchored top/bottom safe regions for slotIndex (0..2).
+    // iconVariant: StripeIconVariant.ON_LIGHT or ON_DARK (resolved by panel).
     // Drawing must use cached data only — never call Garmin data APIs here.
     function draw(
         dc as Dc,
@@ -63,7 +64,8 @@ class StripeElement {
         centerY as Number,
         foregroundColor as Number,
         backgroundColor as Number,
-        slotIndex as Number
+        slotIndex as Number,
+        iconVariant as Number
     ) as Void {
         var stripeLeft = TimeTileStyle.STRIPE_LEFT_X;
         var stripeWidth = TimeTileStyle.STRIPE_WIDTH;
@@ -75,7 +77,14 @@ class StripeElement {
             contentCenterY,
             slotIndex
         );
-        drawBoundedRow(dc, StripeElementLayout.ROW_TOP, topBounds, foregroundColor, backgroundColor);
+        drawBoundedRow(
+            dc,
+            StripeElementLayout.ROW_TOP,
+            topBounds,
+            foregroundColor,
+            backgroundColor,
+            iconVariant
+        );
 
         var bottomBounds = StripeElementLayout.bottomRegionBounds(
             stripeLeft,
@@ -83,7 +92,14 @@ class StripeElement {
             contentCenterY,
             slotIndex
         );
-        drawBoundedRow(dc, StripeElementLayout.ROW_BOTTOM, bottomBounds, foregroundColor, backgroundColor);
+        drawBoundedRow(
+            dc,
+            StripeElementLayout.ROW_BOTTOM,
+            bottomBounds,
+            foregroundColor,
+            backgroundColor,
+            iconVariant
+        );
     }
 
     // rowBounds = [x, y, width, height]
@@ -92,7 +108,8 @@ class StripeElement {
         rowIndex as Number,
         rowBounds as Array<Number>,
         foregroundColor as Number,
-        backgroundColor as Number
+        backgroundColor as Number,
+        iconVariant as Number
     ) as Void {
         var x = rowBounds[0];
         var y = rowBounds[1];
@@ -100,7 +117,7 @@ class StripeElement {
         var height = rowBounds[3];
 
         dc.setClip(x, y, width, height);
-        drawRowIcon(dc, rowIndex, rowBounds, foregroundColor, backgroundColor);
+        drawRowIcon(dc, rowIndex, rowBounds, foregroundColor, backgroundColor, iconVariant);
 
         var text = getRowText(rowIndex);
         if ((text != null) && (text.length() > 0)) {
@@ -128,7 +145,8 @@ class StripeElement {
         rowIndex as Number,
         rowBounds as Array<Number>,
         foregroundColor as Number,
-        backgroundColor as Number
+        backgroundColor as Number,
+        iconVariant as Number
     ) as Void {
     }
 

@@ -8,15 +8,19 @@ class BatteryStripeElement extends StripeElement {
 
     private var _percentage as Number;
     private var _percentageText as String;
-    private var _frameWhite as BitmapResource;
-    private var _frameBlack as BitmapResource;
+    private var _frameOnLight as BitmapResource;
+    private var _frameOnDark as BitmapResource;
+    private var _frameWidth as Number;
+    private var _frameHeight as Number;
 
     function initialize() {
         StripeElement.initialize();
         _percentage = 0;
         _percentageText = "0%";
-        _frameWhite = WatchUi.loadResource($.Rez.Drawables.BatteryFrameWhite) as BitmapResource;
-        _frameBlack = WatchUi.loadResource($.Rez.Drawables.BatteryFrameBlack) as BitmapResource;
+        _frameOnLight = WatchUi.loadResource($.Rez.Drawables.BatteryFrameOnLight) as BitmapResource;
+        _frameOnDark = WatchUi.loadResource($.Rez.Drawables.BatteryFrameOnDark) as BitmapResource;
+        _frameWidth = _frameOnLight.getWidth();
+        _frameHeight = _frameOnLight.getHeight();
     }
 
     function getRefreshIntervalSeconds() as Number {
@@ -44,29 +48,28 @@ class BatteryStripeElement extends StripeElement {
         rowIndex as Number,
         rowBounds as Array<Number>,
         foregroundColor as Number,
-        backgroundColor as Number
+        backgroundColor as Number,
+        iconVariant as Number
     ) as Void {
         if (rowIndex != StripeElementLayout.ROW_TOP) {
             return;
         }
 
-        var frame = _frameWhite;
-        if (foregroundColor == Graphics.COLOR_BLACK) {
-            frame = _frameBlack;
+        var frame = _frameOnLight;
+        if (iconVariant == StripeIconVariant.ON_DARK) {
+            frame = _frameOnDark;
         }
 
-        var assetWidth = BatteryStripeStyle.ASSET_WIDTH;
-        var assetHeight = BatteryStripeStyle.ASSET_HEIGHT;
         var frameX = StripeElementLayout.centeredContentX(
             rowBounds[0],
             rowBounds[2],
-            assetWidth
+            _frameWidth
         );
         var frameY = StripeElementLayout.anchoredContentY(
             rowIndex,
             rowBounds[1],
             rowBounds[3],
-            assetHeight
+            _frameHeight
         );
 
         var maxFillWidth = BatteryStripeStyle.INNER_FILL_MAX_WIDTH;

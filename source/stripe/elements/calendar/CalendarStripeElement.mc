@@ -9,19 +9,27 @@ class CalendarStripeElement extends StripeElement {
 
     private var _weekdayText as String;
     private var _dayText as String;
-    private var _topWhite as BitmapResource;
-    private var _topBlack as BitmapResource;
-    private var _bottomWhite as BitmapResource;
-    private var _bottomBlack as BitmapResource;
+    private var _topOnLight as BitmapResource;
+    private var _topOnDark as BitmapResource;
+    private var _bottomOnLight as BitmapResource;
+    private var _bottomOnDark as BitmapResource;
+    private var _topWidth as Number;
+    private var _topHeight as Number;
+    private var _bottomWidth as Number;
+    private var _bottomHeight as Number;
 
     function initialize() {
         StripeElement.initialize();
         _weekdayText = "";
         _dayText = "";
-        _topWhite = WatchUi.loadResource($.Rez.Drawables.CalendarTopWhite) as BitmapResource;
-        _topBlack = WatchUi.loadResource($.Rez.Drawables.CalendarTopBlack) as BitmapResource;
-        _bottomWhite = WatchUi.loadResource($.Rez.Drawables.CalendarBottomWhite) as BitmapResource;
-        _bottomBlack = WatchUi.loadResource($.Rez.Drawables.CalendarBottomBlack) as BitmapResource;
+        _topOnLight = WatchUi.loadResource($.Rez.Drawables.CalendarTopOnLight) as BitmapResource;
+        _topOnDark = WatchUi.loadResource($.Rez.Drawables.CalendarTopOnDark) as BitmapResource;
+        _bottomOnLight = WatchUi.loadResource($.Rez.Drawables.CalendarBottomOnLight) as BitmapResource;
+        _bottomOnDark = WatchUi.loadResource($.Rez.Drawables.CalendarBottomOnDark) as BitmapResource;
+        _topWidth = _topOnLight.getWidth();
+        _topHeight = _topOnLight.getHeight();
+        _bottomWidth = _bottomOnLight.getWidth();
+        _bottomHeight = _bottomOnLight.getHeight();
     }
 
     function getRefreshIntervalSeconds() as Number {
@@ -44,11 +52,16 @@ class CalendarStripeElement extends StripeElement {
         rowIndex as Number,
         rowBounds as Array<Number>,
         foregroundColor as Number,
-        backgroundColor as Number
+        backgroundColor as Number,
+        iconVariant as Number
     ) as Void {
-        var icon = selectRowIcon(rowIndex, foregroundColor);
-        var iconWidth = icon.getWidth();
-        var iconHeight = icon.getHeight();
+        var icon = selectRowIcon(rowIndex, iconVariant);
+        var iconWidth = _topWidth;
+        var iconHeight = _topHeight;
+        if (rowIndex == StripeElementLayout.ROW_BOTTOM) {
+            iconWidth = _bottomWidth;
+            iconHeight = _bottomHeight;
+        }
         var x = StripeElementLayout.centeredContentX(rowBounds[0], rowBounds[2], iconWidth);
         var y = StripeElementLayout.anchoredContentY(
             rowIndex,
@@ -91,18 +104,18 @@ class CalendarStripeElement extends StripeElement {
         return StripeElementLayout.DEFAULT_ROW_FONT;
     }
 
-    private function selectRowIcon(rowIndex as Number, foregroundColor as Number) as BitmapResource {
-        var useBlack = (foregroundColor == Graphics.COLOR_BLACK);
+    private function selectRowIcon(rowIndex as Number, iconVariant as Number) as BitmapResource {
+        var onDark = (iconVariant == StripeIconVariant.ON_DARK);
         if (rowIndex == StripeElementLayout.ROW_TOP) {
-            if (useBlack) {
-                return _topBlack;
+            if (onDark) {
+                return _topOnDark;
             }
-            return _topWhite;
+            return _topOnLight;
         }
-        if (useBlack) {
-            return _bottomBlack;
+        if (onDark) {
+            return _bottomOnDark;
         }
-        return _bottomWhite;
+        return _bottomOnLight;
     }
 
     private function weekdayAbbrev(dayOfWeek as Number or String) as String {

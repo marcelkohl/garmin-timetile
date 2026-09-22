@@ -1,7 +1,7 @@
 import Toybox.Lang;
 import Toybox.WatchUi;
 
-// Weather-local icon family IDs and resource-pair loading.
+// Weather-local icon family IDs and OnLight/OnDark resource-pair loading.
 // Not a global stripe-element registry.
 module WeatherIconCatalog {
 
@@ -16,55 +16,55 @@ module WeatherIconCatalog {
     // Unset sentinel so the first refresh always loads a pair.
     const FAMILY_UNSET = -1;
 
-    function loadWhite(family as Number) as BitmapResource {
-        return WatchUi.loadResource(whiteResourceId(family)) as BitmapResource;
+    function loadOnLight(family as Number) as BitmapResource {
+        return WatchUi.loadResource(onLightResourceId(family)) as BitmapResource;
     }
 
-    function loadBlack(family as Number) as BitmapResource {
-        return WatchUi.loadResource(blackResourceId(family)) as BitmapResource;
+    function loadOnDark(family as Number) as BitmapResource {
+        return WatchUi.loadResource(onDarkResourceId(family)) as BitmapResource;
     }
 
-    function whiteResourceId(family as Number) as ResourceId {
+    function onLightResourceId(family as Number) as ResourceId {
         if (family == FAMILY_CLEAR) {
-            return $.Rez.Drawables.WeatherClearWhite;
+            return $.Rez.Drawables.WeatherClearOnLight;
         }
         if (family == FAMILY_PARTLY_CLOUDY) {
-            return $.Rez.Drawables.WeatherPartlyCloudyWhite;
+            return $.Rez.Drawables.WeatherPartlyCloudyOnLight;
         }
         if (family == FAMILY_CLOUDY) {
-            return $.Rez.Drawables.WeatherCloudyWhite;
+            return $.Rez.Drawables.WeatherCloudyOnLight;
         }
         if (family == FAMILY_RAIN) {
-            return $.Rez.Drawables.WeatherRainWhite;
+            return $.Rez.Drawables.WeatherRainOnLight;
         }
         if (family == FAMILY_THUNDERSTORM) {
-            return $.Rez.Drawables.WeatherThunderstormWhite;
+            return $.Rez.Drawables.WeatherThunderstormOnLight;
         }
         if (family == FAMILY_SNOW) {
-            return $.Rez.Drawables.WeatherSnowWhite;
+            return $.Rez.Drawables.WeatherSnowOnLight;
         }
-        return $.Rez.Drawables.WeatherUnknownWhite;
+        return $.Rez.Drawables.WeatherUnknownOnLight;
     }
 
-    function blackResourceId(family as Number) as ResourceId {
+    function onDarkResourceId(family as Number) as ResourceId {
         if (family == FAMILY_CLEAR) {
-            return $.Rez.Drawables.WeatherClearBlack;
+            return $.Rez.Drawables.WeatherClearOnDark;
         }
         if (family == FAMILY_PARTLY_CLOUDY) {
-            return $.Rez.Drawables.WeatherPartlyCloudyBlack;
+            return $.Rez.Drawables.WeatherPartlyCloudyOnDark;
         }
         if (family == FAMILY_CLOUDY) {
-            return $.Rez.Drawables.WeatherCloudyBlack;
+            return $.Rez.Drawables.WeatherCloudyOnDark;
         }
         if (family == FAMILY_RAIN) {
-            return $.Rez.Drawables.WeatherRainBlack;
+            return $.Rez.Drawables.WeatherRainOnDark;
         }
         if (family == FAMILY_THUNDERSTORM) {
-            return $.Rez.Drawables.WeatherThunderstormBlack;
+            return $.Rez.Drawables.WeatherThunderstormOnDark;
         }
         if (family == FAMILY_SNOW) {
-            return $.Rez.Drawables.WeatherSnowBlack;
+            return $.Rez.Drawables.WeatherSnowOnDark;
         }
-        return $.Rez.Drawables.WeatherUnknownBlack;
+        return $.Rez.Drawables.WeatherUnknownOnDark;
     }
 }

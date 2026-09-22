@@ -7,6 +7,6 @@
 
     <!-- StripeAppearanceConfiguration: Blue=0 .. Purple=5 -->
     <property id="stripeColor" type="number">0</property>
-    <!-- StripeAppearanceConfiguration: White=0, Black=1 -->
+    <!-- stripeForegroundColor: White=0, Black=1 (text + dynamic fills only) -->
     <property id="stripeForegroundColor" type="number">0</property>
 </properties>

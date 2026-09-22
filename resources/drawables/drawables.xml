@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <drawables xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://developer.garmin.com/downloads/connect-iq/resources.xsd">
     <bitmap id="LauncherIcon" filename="launcher_icon.png" />
-    <bitmap id="StepsIconWhite" filename="generated/steps_white.png" />
-    <bitmap id="StepsIconBlack" filename="generated/steps_black.png" />
-    <bitmap id="CalendarTopWhite" filename="generated/calendar_top_white.png" />
-    <bitmap id="CalendarTopBlack" filename="generated/calendar_top_black.png" />
-    <bitmap id="CalendarBottomWhite" filename="generated/calendar_bottom_white.png" />
-    <bitmap id="CalendarBottomBlack" filename="generated/calendar_bottom_black.png" />
-    <bitmap id="BatteryFrameWhite" filename="generated/battery_frame_white.png" />
-    <bitmap id="BatteryFrameBlack" filename="generated/battery_frame_black.png" />
-    <bitmap id="WeatherClearWhite" filename="generated/weather_clear_white.png" />
-    <bitmap id="WeatherClearBlack" filename="generated/weather_clear_black.png" />
-    <bitmap id="WeatherPartlyCloudyWhite" filename="generated/weather_partly_cloudy_white.png" />
-    <bitmap id="WeatherPartlyCloudyBlack" filename="generated/weather_partly_cloudy_black.png" />
-    <bitmap id="WeatherCloudyWhite" filename="generated/weather_cloudy_white.png" />
-    <bitmap id="WeatherCloudyBlack" filename="generated/weather_cloudy_black.png" />
-    <bitmap id="WeatherRainWhite" filename="generated/weather_rain_white.png" />
-    <bitmap id="WeatherRainBlack" filename="generated/weather_rain_black.png" />
-    <bitmap id="WeatherThunderstormWhite" filename="generated/weather_thunderstorm_white.png" />
-    <bitmap id="WeatherThunderstormBlack" filename="generated/weather_thunderstorm_black.png" />
-    <bitmap id="WeatherSnowWhite" filename="generated/weather_snow_white.png" />
-    <bitmap id="WeatherSnowBlack" filename="generated/weather_snow_black.png" />
-    <bitmap id="WeatherUnknownWhite" filename="generated/weather_unknown_white.png" />
-    <bitmap id="WeatherUnknownBlack" filename="generated/weather_unknown_black.png" />
+    <bitmap id="StepsIconOnLight" filename="generated/steps_on_light.png" />
+    <bitmap id="StepsIconOnDark" filename="generated/steps_on_dark.png" />
+    <bitmap id="CalendarTopOnLight" filename="generated/calendar_top_on_light.png" />
+    <bitmap id="CalendarTopOnDark" filename="generated/calendar_top_on_dark.png" />
+    <bitmap id="CalendarBottomOnLight" filename="generated/calendar_bottom_on_light.png" />
+    <bitmap id="CalendarBottomOnDark" filename="generated/calendar_bottom_on_dark.png" />
+    <bitmap id="BatteryFrameOnLight" filename="generated/battery_frame_on_light.png" />
+    <bitmap id="BatteryFrameOnDark" filename="generated/battery_frame_on_dark.png" />
+    <bitmap id="WeatherClearOnLight" filename="generated/weather_clear_on_light.png" />
+    <bitmap id="WeatherClearOnDark" filename="generated/weather_clear_on_dark.png" />
+    <bitmap id="WeatherPartlyCloudyOnLight" filename="generated/weather_partly_cloudy_on_light.png" />
+    <bitmap id="WeatherPartlyCloudyOnDark" filename="generated/weather_partly_cloudy_on_dark.png" />
+    <bitmap id="WeatherCloudyOnLight" filename="generated/weather_cloudy_on_light.png" />
+    <bitmap id="WeatherCloudyOnDark" filename="generated/weather_cloudy_on_dark.png" />
+    <bitmap id="WeatherRainOnLight" filename="generated/weather_rain_on_light.png" />
+    <bitmap id="WeatherRainOnDark" filename="generated/weather_rain_on_dark.png" />
+    <bitmap id="WeatherThunderstormOnLight" filename="generated/weather_thunderstorm_on_light.png" />
+    <bitmap id="WeatherThunderstormOnDark" filename="generated/weather_thunderstorm_on_dark.png" />
+    <bitmap id="WeatherSnowOnLight" filename="generated/weather_snow_on_light.png" />
+    <bitmap id="WeatherSnowOnDark" filename="generated/weather_snow_on_dark.png" />
+    <bitmap id="WeatherUnknownOnLight" filename="generated/weather_unknown_on_light.png" />
+    <bitmap id="WeatherUnknownOnDark" filename="generated/weather_unknown_on_dark.png" />
 </drawables>

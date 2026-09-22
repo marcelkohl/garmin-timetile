@@ -9,6 +9,7 @@ class StripePanel {
     private var _blockCenterYs as Array<Number>;
     private var _stripeColor as Number;
     private var _foregroundColor as Number;
+    private var _iconVariant as Number;
 
     function initialize(elementIds as Array<Number>) {
         _centerX = StripeElementLayout.stripeCenterX(
@@ -17,6 +18,7 @@ class StripePanel {
         );
         _stripeColor = StripeAppearanceConfiguration.stripeColor();
         _foregroundColor = StripeAppearanceConfiguration.stripeForegroundColor();
+        _iconVariant = StripeAppearanceConfiguration.iconVariant();
         _blockCenterYs = buildBlockCenterYs();
 
         var topId = StripeElementRegistry.NONE;
@@ -92,7 +94,15 @@ class StripePanel {
             dc.setClip(safeX, safeY, safeW, safeH);
             dc.setColor(_stripeColor, _stripeColor);
             dc.fillRectangle(safeX, safeY, safeW, safeH);
-            element.draw(dc, _centerX, _blockCenterYs[i], _foregroundColor, _stripeColor, i);
+            element.draw(
+                dc,
+                _centerX,
+                _blockCenterYs[i],
+                _foregroundColor,
+                _stripeColor,
+                i,
+                _iconVariant
+            );
         }
 
         dc.clearClip();
@@ -114,7 +124,8 @@ class StripePanel {
                 _blockCenterYs[i],
                 _foregroundColor,
                 _stripeColor,
-                i
+                i,
+                _iconVariant
             );
         }
     }

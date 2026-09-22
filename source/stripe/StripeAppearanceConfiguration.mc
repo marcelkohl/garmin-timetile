@@ -3,7 +3,8 @@ import Toybox.Graphics;
 import Toybox.Lang;
 
 // Reads stripe appearance selection IDs from application properties and maps
-// them to Graphics.COLOR_* values. Call on init/reload — not every redraw.
+// them to Graphics.COLOR_* values and icon contrast variants.
+// Call on init/reload — not every redraw.
 module StripeAppearanceConfiguration {
 
     const PROP_STRIPE_COLOR = "stripeColor";
@@ -18,6 +19,7 @@ module StripeAppearanceConfiguration {
     const STRIPE_PURPLE = 5;
 
     // Element foreground selection IDs (stored in properties).
+    // Controls text and dynamic fills only — not SVG bitmap selection.
     const FOREGROUND_WHITE = 0;
     const FOREGROUND_BLACK = 1;
 
@@ -27,6 +29,11 @@ module StripeAppearanceConfiguration {
 
     function stripeForegroundColor() as Number {
         return colorForForegroundSelection(readForegroundSelectionId());
+    }
+
+    // Resolved once per panel init/reload from the current stripe color.
+    function iconVariant() as Number {
+        return iconVariantForStripeSelection(readStripeSelectionId());
     }
 
     function readStripeSelectionId() as Number {
@@ -77,6 +84,15 @@ module StripeAppearanceConfiguration {
         }
         // STRIPE_BLUE and any unexpected value.
         return Graphics.COLOR_BLUE;
+    }
+
+    // Initial FR55 stripe contrast policy (tunable later).
+    // Blue/Green/Yellow/Orange -> OnLight; Red/Purple -> OnDark.
+    function iconVariantForStripeSelection(id as Number) as Number {
+        if ((id == STRIPE_RED) || (id == STRIPE_PURPLE)) {
+            return StripeIconVariant.ON_DARK;
+        }
+        return StripeIconVariant.ON_LIGHT;
     }
 
     function colorForForegroundSelection(id as Number) as Number {

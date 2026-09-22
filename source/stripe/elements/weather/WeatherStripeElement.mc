@@ -11,8 +11,8 @@ class WeatherStripeElement extends StripeElement {
     private var _condition as Number or Null;
     private var _iconFamily as Number;
     private var _temperatureText as String;
-    private var _currentIconWhite as BitmapResource or Null;
-    private var _currentIconBlack as BitmapResource or Null;
+    private var _currentIconOnLight as BitmapResource or Null;
+    private var _currentIconOnDark as BitmapResource or Null;
     private var _iconWidth as Number;
     private var _iconHeight as Number;
 
@@ -21,8 +21,8 @@ class WeatherStripeElement extends StripeElement {
         _condition = null;
         _iconFamily = WeatherIconCatalog.FAMILY_UNSET;
         _temperatureText = "--";
-        _currentIconWhite = null;
-        _currentIconBlack = null;
+        _currentIconOnLight = null;
+        _currentIconOnDark = null;
         _iconWidth = 0;
         _iconHeight = 0;
     }
@@ -63,28 +63,27 @@ class WeatherStripeElement extends StripeElement {
         rowIndex as Number,
         rowBounds as Array<Number>,
         foregroundColor as Number,
-        backgroundColor as Number
+        backgroundColor as Number,
+        iconVariant as Number
     ) as Void {
         if (rowIndex != StripeElementLayout.ROW_TOP) {
             return;
         }
-        if ((_currentIconWhite == null) || (_currentIconBlack == null)) {
+        if ((_currentIconOnLight == null) || (_currentIconOnDark == null)) {
             return;
         }
 
-        var icon = _currentIconWhite as BitmapResource;
-        if (foregroundColor == Graphics.COLOR_BLACK) {
-            icon = _currentIconBlack as BitmapResource;
+        var icon = _currentIconOnLight as BitmapResource;
+        if (iconVariant == StripeIconVariant.ON_DARK) {
+            icon = _currentIconOnDark as BitmapResource;
         }
 
-        var iconWidth = _iconWidth;
-        var iconHeight = _iconHeight;
-        var x = StripeElementLayout.centeredContentX(rowBounds[0], rowBounds[2], iconWidth);
+        var x = StripeElementLayout.centeredContentX(rowBounds[0], rowBounds[2], _iconWidth);
         var y = StripeElementLayout.anchoredContentY(
             rowIndex,
             rowBounds[1],
             rowBounds[3],
-            iconHeight
+            _iconHeight
         );
         dc.drawBitmap(x, y, icon);
     }
@@ -106,16 +105,16 @@ class WeatherStripeElement extends StripeElement {
     // Returns true when the cached resource pair was replaced.
     private function replaceIconsIfFamilyChanged(family as Number) as Boolean {
         if ((_iconFamily == family)
-            && (_currentIconWhite != null)
-            && (_currentIconBlack != null)) {
+            && (_currentIconOnLight != null)
+            && (_currentIconOnDark != null)) {
             return false;
         }
 
         _iconFamily = family;
-        _currentIconWhite = WeatherIconCatalog.loadWhite(family);
-        _currentIconBlack = WeatherIconCatalog.loadBlack(family);
-        _iconWidth = (_currentIconWhite as BitmapResource).getWidth();
-        _iconHeight = (_currentIconWhite as BitmapResource).getHeight();
+        _currentIconOnLight = WeatherIconCatalog.loadOnLight(family);
+        _currentIconOnDark = WeatherIconCatalog.loadOnDark(family);
+        _iconWidth = (_currentIconOnLight as BitmapResource).getWidth();
+        _iconHeight = (_currentIconOnLight as BitmapResource).getHeight();
         return true;
     }
 
