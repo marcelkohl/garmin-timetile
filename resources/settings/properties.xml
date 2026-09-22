@@ -2,11 +2,11 @@
 <properties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://developer.garmin.com/downloads/connect-iq/resources.xsd">
     <!-- Numeric IDs match StripeElementRegistry: NONE=0, BATTERY=1, CALENDAR=2, STEPS=3, WEATHER=4 -->
     <property id="topStripeElement" type="number">1</property>
-    <property id="middleStripeElement" type="number">2</property>
+    <property id="middleStripeElement" type="number">4</property>
     <property id="bottomStripeElement" type="number">3</property>
 
     <!-- StripeAppearanceConfiguration: Blue=0 .. Purple=5 -->
     <property id="stripeColor" type="number">0</property>
     <!-- stripeForegroundColor: White=0, Black=1 (text + dynamic fills only) -->
-    <property id="stripeForegroundColor" type="number">0</property>
+    <property id="stripeForegroundColor" type="number">1</property>
 </properties>

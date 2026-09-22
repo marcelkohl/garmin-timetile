@@ -2,6 +2,8 @@
 
 Minimal Garmin Connect IQ watch face for the Forerunner 55 (`fr55`).
 
+![Time Tile running on a Garmin Forerunner 55](docs/sample.png)
+
 ## Current status
 
 Initial project scaffolding only. The watch face currently draws a black
@@ -134,7 +136,7 @@ does not invent a UUID filename.
   work the same way for an unsigned-workflow sideload; treat Connect settings
   support as unverified for this first physical test.
 - Without a `.SET` file, `resources/settings/properties.xml` defaults apply
-  (Battery / Calendar / Steps, Blue stripe, White text/dynamic color). The first
+  (Battery / Weather / Steps, Blue stripe, Black text and dynamic color). The first
   physical test may use defaults only.
 
 ### Physical test checklist
