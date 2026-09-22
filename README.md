@@ -62,7 +62,10 @@ listed in `.gitignore` and must stay outside version control.
 | `make check` | Verify Distrobox, SDK, device package, and developer key |
 | `make assets` | Generate PNG icons from SVG sources (host ImageMagick) |
 | `make build` | Generate assets, then compile and sign a debug `.prg` for `fr55` |
-| `make clean` | Delete `build/` and generated icon PNGs |
+| `make device-build` | Compile/sign FR55 `.prg` and copy to `dist/TimeTile_fr55.prg` |
+| `make device-check` | Validate `DEVICE_ROOT` for safe USB sideload (no writes) |
+| `make sideload` | Build device binary, check mount, copy `TIMETILE.PRG` |
+| `make clean` | Delete `build/`, `dist/TimeTile_fr55.prg`, and generated icon PNGs |
 | `make simulator` | Start the Connect IQ simulator (inside the container) |
 | `make run` | Build and launch the `.prg` in the simulator |
 
@@ -74,6 +77,81 @@ make build CONTAINER=garmin-sdk
 make build SDK_CFG="$HOME/.Garmin/ConnectIQ/current-sdk.cfg"
 make build DEVELOPER_KEY="$HOME/.config/garmin-connect-iq/developer_key.der"
 ```
+
+## Physical Forerunner 55 testing
+
+USB sideload only. No automatic device discovery. Pass the watch mount root
+explicitly as `DEVICE_ROOT`.
+
+1. Connect the Forerunner 55 by USB.
+2. Wait until the mass-storage volume mounts.
+3. Identify the mount root that contains `GARMIN/APPS` (and usually
+   `GARMIN/GarminDevice.xml`).
+4. Validate (read-only):
+
+```bash
+make device-check DEVICE_ROOT=/media/user/GARMIN
+```
+
+5. Sideload (builds `dist/TimeTile_fr55.prg`, then copies it):
+
+```bash
+make sideload DEVICE_ROOT=/media/user/GARMIN
+```
+
+   If `GARMIN/APPS/TIMETILE.PRG` already exists, the copy stops unless you
+   explicitly replace **only** that file:
+
+```bash
+make sideload DEVICE_ROOT=/media/user/GARMIN FORCE=1
+```
+
+6. Safely eject / unmount the watch, then unplug USB.
+7. Restart or disconnect as needed so the watchface list refreshes.
+8. Select **Time Tile** from the watchface chooser.
+9. To uninstall the sideload later, remove **only**:
+
+```text
+GARMIN/APPS/TIMETILE.PRG
+```
+
+Do not delete other `.PRG` files or similarly named Garmin apps.
+
+### Sideload filename
+
+The destination name is `TIMETILE.PRG` (8 characters before `.PRG`), which
+matches common Connect IQ USB sideload practice on FAT volumes. This project
+does not invent a UUID filename.
+
+### App settings on a physical sideload
+
+- `build/TimeTile_fr55-settings.json` is **simulator metadata** for
+  `monkeydo -a`. Do **not** copy it to the watch.
+- Sideloaded apps may use a matching `.SET` under `GARMIN/APPS/SETTINGS` for
+  non-default settings (same base name as the `.PRG`, including case). This
+  Makefile does **not** generate or copy `.SET` files.
+- Garmin Connect / Connect IQ phone settings for store apps are not assumed to
+  work the same way for an unsigned-workflow sideload; treat Connect settings
+  support as unverified for this first physical test.
+- Without a `.SET` file, `resources/settings/properties.xml` defaults apply
+  (Battery / Calendar / Steps, Blue stripe, White text/dynamic color). The first
+  physical test may use defaults only.
+
+### Physical test checklist
+
+- Watchface launches.
+- Hour/minute layout is centered.
+- Stripe does not clip at the circular edge.
+- Battery frame and fill are aligned.
+- Calendar is readable.
+- Steps icon and value are readable.
+- Weather icon and temperature are readable when selected.
+- Actual SVG lines are inspected for MIP dithering.
+- Steps update behavior is observed in low-power mode.
+- Battery updates after its five-minute interval.
+- No crash or fallback to the stock watchface.
+- Memory remains acceptable.
+- Settings behavior on a sideloaded app is recorded.
 
 ## Icon assets
 
@@ -148,7 +226,8 @@ Preferred longer-term converter: `rsvg-convert` from `librsvg2-bin`.
 ├── source/
 │   ├── TimeTileApp.mc
 │   └── TimeTileView.mc
-└── build/                  (generated; gitignored)
+├── build/                  (simulator/debug build; gitignored)
+└── dist/                   (device sideload .prg only; gitignored)
 ```
 
 ## Troubleshooting

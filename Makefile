@@ -8,8 +8,15 @@ DEVELOPER_KEY  ?= $(HOME)/.config/garmin-connect-iq/developer_key.der
 DEVICES_DIR    ?= $(HOME)/.Garmin/ConnectIQ/Devices
 
 BUILD_DIR      := build
+DIST_DIR       := dist
 APP_NAME       := TimeTile
 PRG            := $(BUILD_DIR)/$(APP_NAME)_$(DEVICE).prg
+# Signed FR55 binary for USB sideload (PRG only — never pack simulator settings JSON).
+DIST_PRG       := $(DIST_DIR)/$(APP_NAME)_$(DEVICE).prg
+# Sideload destination basename (8-char FAT-friendly; not a UUID).
+SIDELOAD_PRG_NAME := TIMETILE.PRG
+# Set FORCE=1 to replace an existing TIMETILE.PRG on the device.
+FORCE          ?=
 # monkeyc writes this next to the .prg when resources/settings/settings.xml is present.
 SETTINGS_JSON  := $(BUILD_DIR)/$(APP_NAME)_$(DEVICE)-settings.json
 SETTINGS_SRC   := resources/settings/settings.xml
@@ -79,21 +86,24 @@ define in_container
 distrobox enter "$(CONTAINER)" -- bash --noprofile --norc -c $(1)
 endef
 
-.PHONY: help check assets build clean simulator run
+.PHONY: help check assets build device-build device-check sideload clean simulator run
 
 help:
 	@echo "Time Tile — Connect IQ watch face"
 	@echo ""
 	@echo "Targets:"
-	@echo "  help       List available targets"
-	@echo "  check      Verify Distrobox, SDK tools, device package, and developer key"
-	@echo "  assets     Generate PNG icons from SVG sources (host ImageMagick)"
-	@echo "  build      Generate assets, then compile and sign a debug .prg for $(DEVICE)"
-	@echo "  clean      Remove build/ and generated icon PNGs"
-	@echo "  simulator  Start the Connect IQ simulator inside the container"
-	@echo "  run        Build and launch the .prg on the simulator for $(DEVICE)"
+	@echo "  help          List available targets"
+	@echo "  check         Verify Distrobox, SDK tools, device package, and developer key"
+	@echo "  assets        Generate PNG icons from SVG sources (host ImageMagick)"
+	@echo "  build         Generate assets, then compile and sign a debug .prg for $(DEVICE)"
+	@echo "  device-build  Compile/sign FR55 .prg and copy to $(DIST_PRG)"
+	@echo "  device-check  Validate DEVICE_ROOT for safe USB sideload (no writes)"
+	@echo "  sideload      device-build + device-check, then copy $(SIDELOAD_PRG_NAME)"
+	@echo "  clean         Remove build/, dist PRG, and generated icon PNGs"
+	@echo "  simulator     Start the Connect IQ simulator inside the container"
+	@echo "  run           Build and launch the .prg on the simulator for $(DEVICE)"
 	@echo ""
-	@echo "Overrides: CONTAINER DEVICE SDK_CFG DEVELOPER_KEY DEVICES_DIR"
+	@echo "Overrides: CONTAINER DEVICE SDK_CFG DEVELOPER_KEY DEVICES_DIR DEVICE_ROOT FORCE"
 
 check:
 	@status=0; \
@@ -199,10 +209,106 @@ build: check assets
 			-w")
 	@echo "OK: built $(PRG)"
 
+# Physical-device FR55 binary. Same signed monkeyc output as `build`; only the .prg
+# is copied to dist/ (simulator *-settings.json stays under build/).
+device-build: check assets
+	@mkdir -p "$(BUILD_DIR)" "$(DIST_DIR)"
+	@echo "Compiling $(APP_NAME) for physical $(DEVICE)..."
+	@echo "Compiler command:"
+	@echo "  $(MONKEYC) -f $(JUNGLE) -o $(PRG) -d $(DEVICE) -y $(DEVELOPER_KEY) -w"
+	@$(call in_container,"set -e; \
+		'$(MONKEYC)' \
+			-f '$(CURDIR)/$(JUNGLE)' \
+			-o '$(CURDIR)/$(PRG)' \
+			-d '$(DEVICE)' \
+			-y '$(DEVELOPER_KEY)' \
+			-w")
+	@cp -f "$(PRG)" "$(DIST_PRG)"
+	@echo "OK: device binary ready at $(DIST_PRG)"
+	@ls -l "$(DIST_PRG)"
+
+# Validate DEVICE_ROOT for sideload. Read-only checks; never creates GARMIN/APPS.
+device-check:
+	@status=0; \
+	src="$(CURDIR)/$(DIST_PRG)"; \
+	if [ -z "$(DEVICE_ROOT)" ]; then \
+		echo "ERROR: DEVICE_ROOT is empty. Pass DEVICE_ROOT=/absolute/path/to/garmin"; \
+		exit 1; \
+	fi; \
+	root="$(DEVICE_ROOT)"; \
+	case "$$root" in \
+		/*) ;; \
+		*) echo "ERROR: DEVICE_ROOT must be an absolute path (got: $$root)"; exit 1 ;; \
+	esac; \
+	if [ "$$root" = "/" ]; then \
+		echo "ERROR: DEVICE_ROOT must not be /"; \
+		exit 1; \
+	fi; \
+	if [ "$$root" = "$(HOME)" ] || [ "$$root" = "$(HOME)/" ]; then \
+		echo "ERROR: DEVICE_ROOT must not be the home directory"; \
+		exit 1; \
+	fi; \
+	if [ ! -d "$$root" ]; then \
+		echo "ERROR: DEVICE_ROOT does not exist or is not a directory: $$root"; \
+		exit 1; \
+	fi; \
+	apps="$$root/GARMIN/APPS"; \
+	if [ ! -d "$$apps" ]; then \
+		echo "ERROR: missing $$apps"; \
+		echo "       Do not create GARMIN/APPS manually unless the watch is mounted correctly."; \
+		exit 1; \
+	fi; \
+	if [ ! -w "$$apps" ]; then \
+		echo "ERROR: $$apps is not writable"; \
+		exit 1; \
+	fi; \
+	if [ ! -f "$$src" ]; then \
+		echo "ERROR: device binary not found: $$src"; \
+		echo "       Run: make device-build"; \
+		exit 1; \
+	fi; \
+	garmin_ok=0; \
+	if [ -f "$$root/GARMIN/GarminDevice.xml" ] || [ -f "$$root/GARMIN/GarminDevice.XML" ]; then \
+		garmin_ok=1; \
+	fi; \
+	if [ "$$garmin_ok" -ne 1 ]; then \
+		echo "ERROR: $$root does not look like a Garmin device (missing GARMIN/GarminDevice.xml)"; \
+		exit 1; \
+	fi; \
+	dest="$$apps/$(SIDELOAD_PRG_NAME)"; \
+	echo "OK: device-check passed"; \
+	echo "  Source:      $$src"; \
+	echo "  Destination: $$dest"
+
+# Copy only dist/TimeTile_fr55.prg -> $(DEVICE_ROOT)/GARMIN/APPS/TIMETILE.PRG
+sideload: device-build device-check
+	@src="$(CURDIR)/$(DIST_PRG)"; \
+	dest="$(DEVICE_ROOT)/GARMIN/APPS/$(SIDELOAD_PRG_NAME)"; \
+	echo "Sideload source:      $$src"; \
+	echo "Sideload destination: $$dest"; \
+	if [ -e "$$dest" ] && [ "$(FORCE)" != "1" ]; then \
+		echo "ERROR: $$dest already exists."; \
+		echo "       Refusing to overwrite. Re-run with FORCE=1 to replace only that file."; \
+		exit 1; \
+	fi; \
+	if [ -e "$$dest" ] && [ "$(FORCE)" = "1" ]; then \
+		echo "Replacing existing Time Tile sideload at $$dest"; \
+	fi; \
+	cp -f "$$src" "$$dest"; \
+	sync; \
+	echo "OK: copied $$src -> $$dest"; \
+	echo "Reminder: safely eject/unmount the watch before unplugging USB."
+
 clean:
 	@rm -rf "$(BUILD_DIR)"
+	@rm -f "$(DIST_PRG)"
+	@if [ -d "$(DIST_DIR)" ]; then \
+		if [ -z "$$(ls -A "$(DIST_DIR)" 2>/dev/null)" ]; then \
+			rmdir "$(DIST_DIR)"; \
+		fi; \
+	fi
 	@rm -f $(GENERATED_PNGS) $(LEGACY_PNGS)
-	@echo "OK: removed $(BUILD_DIR)/ and generated icon PNGs"
+	@echo "OK: removed $(BUILD_DIR)/, $(DIST_PRG), and generated icon PNGs"
 
 simulator:
 	@echo "Starting Connect IQ simulator in container '$(CONTAINER)'..."
